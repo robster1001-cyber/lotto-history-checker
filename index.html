@@ -1542,6 +1542,51 @@
       }
     }
 
+
+    .picker-actions {
+      position: sticky;
+      bottom: 12px;
+      z-index: 24;
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.26);
+      backdrop-filter: blur(8px);
+    }
+
+    .picker-actions button {
+      flex: 1 1 140px;
+    }
+
+    .picker-personality-sticky {
+      position: sticky;
+      top: 10px;
+      z-index: 22;
+      padding: 12px 0 8px;
+      background: linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(30,41,59,0.92) 75%, rgba(30,41,59,0) 100%);
+      backdrop-filter: blur(4px);
+    }
+
+    .picker-post-style.hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 620px) {
+      .picker-actions {
+        bottom: 8px;
+      }
+
+      .picker-actions button {
+        min-height: 48px;
+      }
+
+      .picker-personality-sticky {
+        top: 6px;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -1698,24 +1743,26 @@ Results are based on real historical lottery draw data.
             <div class="picker-help-panel hidden" id="pickerHelpPanel"></div>
           </div>
 
-          <div class="subsection">
-            <h4>Line personality</h4>
-            <div class="tier-pill mid dim" id="pickerVerdictPill">⏳ No rush, mate...</div>
-            <p class="muted" id="pickerVerdictText">Pick a style when you are ready. Then see if you would actually trust the weird little line it gives you.</p>
-          </div>
+          <div class="picker-post-style hidden" id="pickerPostStyleArea">
+            <div class="subsection picker-personality-sticky">
+              <h4>Line personality</h4>
+              <div class="tier-pill mid dim" id="pickerVerdictPill">⏳ No rush, mate...</div>
+              <p class="muted" id="pickerVerdictText">Pick a style when you are ready. Then see if you would actually trust the weird little line it gives you.</p>
+            </div>
 
-          <div class="btn-row">
-            <button class="primary" id="pickerTestBtn">Test This Line</button>
-            <button id="pickerCopyBtn">Copy Numbers</button>
-            <button id="pickerClearBtn">Clear Line</button>
-          </div>
+            <div class="subsection" id="pickerGeneratedArea">
+              <h4>Generated numbers</h4>
+              <div id="pickerGrid" class="number-grid"></div>
+              <div id="pickerBonusWrap" class="hidden">
+                <h4 id="pickerBonusTitle">Generated bonus numbers</h4>
+                <div id="pickerBonusGrid" class="number-grid"></div>
+              </div>
+            </div>
 
-          <div class="subsection">
-            <h4>Generated numbers</h4>
-            <div id="pickerGrid" class="number-grid"></div>
-            <div id="pickerBonusWrap" class="hidden">
-              <h4 id="pickerBonusTitle">Generated bonus numbers</h4>
-              <div id="pickerBonusGrid" class="number-grid"></div>
+            <div class="btn-row picker-actions">
+              <button class="primary" id="pickerTestBtn">Test This Line</button>
+              <button id="pickerCopyBtn">Copy Numbers</button>
+              <button id="pickerClearBtn">Clear Line</button>
             </div>
           </div>
         </div>
@@ -1956,6 +2003,8 @@ async function loadLottoData() {
     const resultsBackTopBtn = document.getElementById('resultsBackTopBtn');
     const pickerHelpPanel = document.getElementById('pickerHelpPanel');
     const workspaceShell = document.getElementById('workspaceShell');
+    const pickerPostStyleArea = document.getElementById('pickerPostStyleArea');
+    const pickerGeneratedArea = document.getElementById('pickerGeneratedArea');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -2057,6 +2106,7 @@ function pickFromPool(pool, count) {
 
     function resetPickerBox() {
   pickerResultsBox.innerHTML = '';
+  setPickerPostStyleVisibility(false);
   updatePickerModeUI(null);
   updatePickerVerdict('manual');
   updateResultsBackTopVisibility();
@@ -2122,6 +2172,12 @@ function pickFromPool(pool, count) {
       pickerHelpPanel.classList.add('hidden');
       pickerHelpPanel.innerHTML = '';
       document.querySelectorAll('.mode-help').forEach(btn => btn.classList.remove('active'));
+    }
+
+
+    function setPickerPostStyleVisibility(show) {
+      if (!pickerPostStyleArea) return;
+      pickerPostStyleArea.classList.toggle('hidden', !show);
     }
 
     function updatePickerModeUI(mode) {
@@ -2883,9 +2939,16 @@ function applyPicker(type) {
 
   selectedBonus = game.bonusCount > 0 ? randomUnique(game.bonusMax, game.bonusCount) : [];
 
+  setPickerPostStyleVisibility(true);
   renderPickerNumbers();
   updateSelectedDisplay();
   renderIntelligence();
+
+  if (pickerGeneratedArea) {
+    setTimeout(() => {
+      pickerGeneratedArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 90);
+  }
 
   const verdict = analyseTicket(selectedMain, type);
 
