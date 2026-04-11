@@ -1587,9 +1587,39 @@
       }
     }
 
+
+    .top-reset-btn {
+      position: fixed;
+      top: 14px;
+      right: 14px;
+      z-index: 60;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(255,255,255,0.10);
+      color: #e5e7eb;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.24);
+      backdrop-filter: blur(8px);
+      font-weight: 800;
+    }
+
+    .top-reset-btn.hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 620px) {
+      .top-reset-btn {
+        top: 10px;
+        right: 10px;
+        padding: 10px 12px;
+        font-size: 0.92rem;
+      }
+    }
+
 </style>
 </head>
 <body>
+  <button class="top-reset-btn hidden" id="topResetBtn" type="button">Reset</button>
   <div class="app">
     
     
@@ -2005,6 +2035,7 @@ async function loadLottoData() {
     const workspaceShell = document.getElementById('workspaceShell');
     const pickerPostStyleArea = document.getElementById('pickerPostStyleArea');
     const pickerGeneratedArea = document.getElementById('pickerGeneratedArea');
+    const topResetBtn = document.getElementById('topResetBtn');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -3302,6 +3333,27 @@ function clearSelections() {
       resetChallengeBox();
     }
 
+
+    function fullyResetToHome() {
+      clearSelections();
+      clearChallengeSelections();
+      setStartMode('launch');
+      currentGame = 'lotto';
+      document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
+      document.querySelectorAll('[data-game="lotto"]').forEach(x => x.classList.add('active-game'));
+      renderGame();
+      if (workspaceShell) workspaceShell.classList.add('hidden');
+      document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+      if (topResetBtn) topResetBtn.classList.add('hidden');
+    }
+
+    function updateTopResetVisibility() {
+      if (!topResetBtn || !workspaceShell) return;
+      const workspaceVisible = !workspaceShell.classList.contains('hidden');
+      const nearTop = window.scrollY < 220;
+      topResetBtn.classList.toggle('hidden', !(workspaceVisible && nearTop));
+    }
+
     function switchFeature(feature) {
       currentFeature = feature;
       const appRoot = document.querySelector('.app');
@@ -3350,6 +3402,7 @@ function clearSelections() {
         workspaceShell.classList.add('result-flash');
       }
 
+      updateTopResetVisibility();
       setTimeout(() => {
         workspaceShell?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 60);
@@ -3474,21 +3527,23 @@ function clearSelections() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
         setTimeout(() => {
-          clearSelections();
-          clearChallengeSelections();
-          setStartMode('launch');
-          currentGame = 'lotto';
-          document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
-          document.querySelectorAll('[data-game="lotto"]').forEach(x => x.classList.add('active-game'));
-          renderGame();
-          if (workspaceShell) workspaceShell.classList.add('hidden');
-          document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+          fullyResetToHome();
         }, 420);
       });
     }
 
     window.addEventListener('scroll', updateResultsBackTopVisibility, { passive: true });
     window.addEventListener('resize', updateResultsBackTopVisibility);
+
+
+    if (topResetBtn) {
+      topResetBtn.addEventListener('click', () => {
+        fullyResetToHome();
+      });
+    }
+
+    window.addEventListener('scroll', updateTopResetVisibility, { passive: true });
+    window.addEventListener('resize', updateTopResetVisibility);
 
     (async function bootApp() {
       await initialiseLottoData();
@@ -3497,6 +3552,7 @@ function clearSelections() {
       updateResultsVisibility('stats');
       if (workspaceShell) workspaceShell.classList.add('hidden');
       document.querySelectorAll('.feature-card').forEach(card => card.classList.remove('active'));
+      updateTopResetVisibility();
     })();
 </script>
 </body>
