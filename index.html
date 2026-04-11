@@ -3423,6 +3423,17 @@ function clearSelections() {
       if (workspaceShell) workspaceShell.classList.add('hidden');
       document.querySelectorAll('.feature-card').forEach(card => card.classList.remove('active'));
     })();
-  </script>
+  
+    window.addEventListener('scroll', () => {
+      const workspace = document.getElementById('workspaceShell');
+      if (!workspace) return;
+
+      if (window.scrollY < 120) {
+        workspace.classList.add('hidden');
+        document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+      }
+    });
+
+</script>
 </body>
 </html>
