@@ -3205,7 +3205,10 @@ function runPickerCheck() {
 
   challengeResultsBox.innerHTML = `
     <div class="kicker">Bulk Buy result</div>
-    <h3>${challengeTickets.toLocaleString()} tickets tested</h3>
+    <h3 style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+      <span>${challengeTickets.toLocaleString()} tickets tested</span>
+      <span style="font-size:0.86rem;font-weight:800;color:var(--muted);padding-top:4px;">From lottery launch</span>
+    </h3>
     <div class="result-headline">
       <div class="hero-stat ${profitLoss >= 0 ? 'positive' : 'negative'}">
         <div class="label">Profit / loss</div>
@@ -3216,10 +3219,6 @@ function runPickerCheck() {
       </div>
 
       <div class="mini-stat-grid">
-        <div class="mini-stat">
-          <div class="label">Checked from</div>
-          <div class="value">Lottery launch</div>
-        </div>
         <div class="mini-stat">
           <div class="label">Draws tested</div>
           <div class="value">${draws.length.toLocaleString()}</div>
