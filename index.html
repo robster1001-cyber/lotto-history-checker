@@ -1858,9 +1858,9 @@ Results are based on real historical lottery draw data.
           </div>
         </div>
 
-        <div class="result-box" id="historyResultsBox"></div>
+        <div class="result-box hidden" id="historyResultsBox"></div>
         <div class="result-box hidden" id="pickerResultsBox"></div>
-        <div class="result-box" id="challengeResultsBox"></div>
+        <div class="result-box hidden" id="challengeResultsBox"></div>
 
         <button class="results-back-top hidden" id="resultsBackTopBtn" type="button">↑ Top</button>
 </div>
@@ -2125,18 +2125,21 @@ function pickFromPool(pool, count) {
 
     function resetHistoryBox() {
   historyResultsBox.innerHTML = '';
+  historyResultsBox.classList.add('hidden');
   setHistoryResultsDimmed(true);
   updateResultsBackTopVisibility();
 }
 
     function resetChallengeBox() {
   challengeResultsBox.innerHTML = '';
+  challengeResultsBox.classList.add('hidden');
   setChallengeResultsDimmed(true);
   updateResultsBackTopVisibility();
 }
 
     function resetPickerBox() {
   pickerResultsBox.innerHTML = '';
+  pickerResultsBox.classList.add('hidden');
   setPickerPostStyleVisibility(false);
   updatePickerModeUI(null);
   updatePickerVerdict('manual');
@@ -2165,10 +2168,17 @@ function pickFromPool(pool, count) {
       const rightPanel = document.querySelector('.panel.right');
       const hideRightPanel = feature === 'stats' || feature === 'ticket';
       if (rightPanel) rightPanel.classList.toggle('hidden', hideRightPanel);
+
       selectedGameBox.classList.toggle('hidden', feature !== 'check');
-      historyResultsBox.classList.toggle('hidden', feature !== 'check');
-      pickerResultsBox.classList.toggle('hidden', feature !== 'picker');
-      challengeResultsBox.classList.toggle('hidden', feature !== 'challenge');
+
+      const historyHasContent = historyResultsBox.innerHTML.trim() !== '';
+      const pickerHasContent = pickerResultsBox.innerHTML.trim() !== '';
+      const challengeHasContent = challengeResultsBox.innerHTML.trim() !== '';
+
+      historyResultsBox.classList.toggle('hidden', feature !== 'check' || !historyHasContent);
+      pickerResultsBox.classList.toggle('hidden', feature !== 'picker' || !pickerHasContent);
+      challengeResultsBox.classList.toggle('hidden', feature !== 'challenge' || !challengeHasContent);
+
       updateResultsBackTopVisibility();
     }
 
