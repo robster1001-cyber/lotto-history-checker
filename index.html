@@ -3409,6 +3409,11 @@ function clearSelections() {
     if (resultsBackTopBtn) {
       resultsBackTopBtn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        setTimeout(() => {
+          if (workspaceShell) workspaceShell.classList.add('hidden');
+          document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+        }, 420);
       });
     }
 
@@ -3423,17 +3428,6 @@ function clearSelections() {
       if (workspaceShell) workspaceShell.classList.add('hidden');
       document.querySelectorAll('.feature-card').forEach(card => card.classList.remove('active'));
     })();
-  
-    window.addEventListener('scroll', () => {
-      const workspace = document.getElementById('workspaceShell');
-      if (!workspace) return;
-
-      if (window.scrollY < 120) {
-        workspace.classList.add('hidden');
-        document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
-      }
-    });
-
 </script>
 </body>
 </html>
