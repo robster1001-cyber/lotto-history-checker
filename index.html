@@ -3411,6 +3411,13 @@ function clearSelections() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
         setTimeout(() => {
+          clearSelections();
+          clearChallengeSelections();
+          setStartMode('launch');
+          currentGame = 'lotto';
+          document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
+          document.querySelectorAll('[data-game="lotto"]').forEach(x => x.classList.add('active-game'));
+          renderGame();
           if (workspaceShell) workspaceShell.classList.add('hidden');
           document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
         }, 420);
