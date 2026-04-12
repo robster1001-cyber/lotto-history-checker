@@ -1617,6 +1617,22 @@
     }
 
 
+
+    .home-entry {
+      transition: opacity 0.22s ease, transform 0.22s ease, max-height 0.28s ease, margin 0.22s ease;
+      transform-origin: top center;
+    }
+
+    .home-entry.collapsed {
+      opacity: 0;
+      transform: translateY(-10px);
+      max-height: 0 !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
 </style>
 </head>
 <body>
@@ -1636,7 +1652,7 @@
 
 
     
-    <section class="home-cards">
+    <section class="home-cards home-entry" id="homeCardsSection">
       <div class="card feature-card" data-feature="check">
         <div class="icon">🎰</div>
         <h3>Your Numbers</h3>
@@ -1659,7 +1675,7 @@
       </div>
     </section>
 
-    <div style="text-align:center; margin:20px 0 10px; color:#9aa4b2; font-size:0.85rem; line-height:1.5;">
+    <div class="home-entry" id="homeFooterNote" style="text-align:center; margin:20px 0 10px; color:#9aa4b2; font-size:0.85rem; line-height:1.5;">
       <div style="margin-bottom:8px;">
 This prototype is independently developed and is not affiliated with or endorsed by any official lottery operator.
 </div>
@@ -2036,6 +2052,8 @@ async function loadLottoData() {
     const pickerPostStyleArea = document.getElementById('pickerPostStyleArea');
     const pickerGeneratedArea = document.getElementById('pickerGeneratedArea');
     const topResetBtn = document.getElementById('topResetBtn');
+    const homeCardsSection = document.getElementById('homeCardsSection');
+    const homeFooterNote = document.getElementById('homeFooterNote');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -3347,6 +3365,17 @@ function clearSelections() {
     }
 
 
+
+    function collapseHomeEntry() {
+      if (homeCardsSection) homeCardsSection.classList.add('collapsed');
+      if (homeFooterNote) homeFooterNote.classList.add('collapsed');
+    }
+
+    function expandHomeEntry() {
+      if (homeCardsSection) homeCardsSection.classList.remove('collapsed');
+      if (homeFooterNote) homeFooterNote.classList.remove('collapsed');
+    }
+
     function fullyResetToHome() {
       clearSelections();
       clearChallengeSelections();
@@ -3356,6 +3385,7 @@ function clearSelections() {
       document.querySelectorAll('[data-game="lotto"]').forEach(x => x.classList.add('active-game'));
       renderGame();
       if (workspaceShell) workspaceShell.classList.add('hidden');
+      expandHomeEntry();
       document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
       if (topResetBtn) topResetBtn.classList.add('hidden');
     }
@@ -3377,6 +3407,7 @@ function clearSelections() {
       if (workspaceShell) {
         workspaceShell.classList.remove('hidden');
       }
+      collapseHomeEntry();
 
       document.querySelectorAll('.feature-card').forEach(card => {
         card.classList.toggle('active', card.dataset.feature === feature);
@@ -3407,9 +3438,8 @@ function clearSelections() {
 
       updateTopResetVisibility();
       setTimeout(() => {
-        const targetPanel = document.querySelector('.panel.left');
-        if (targetPanel) {
-          targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (workspaceShell) {
+          workspaceShell.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 120);
     }
@@ -3557,6 +3587,7 @@ function clearSelections() {
       renderGame();
       updateResultsVisibility('stats');
       if (workspaceShell) workspaceShell.classList.add('hidden');
+      expandHomeEntry();
       document.querySelectorAll('.feature-card').forEach(card => card.classList.remove('active'));
       updateTopResetVisibility();
     })();
