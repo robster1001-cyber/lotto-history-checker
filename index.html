@@ -1616,6 +1616,17 @@
       }
     }
 
+
+    .workspace-shell {
+      scroll-margin-top: 18px;
+    }
+
+    @media (max-width: 620px) {
+      .workspace-shell {
+        scroll-margin-top: 26px;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -3406,7 +3417,10 @@ function clearSelections() {
 
       updateTopResetVisibility();
       setTimeout(() => {
-        workspaceShell?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const targetTop = workspaceShell
+          ? window.pageYOffset + workspaceShell.getBoundingClientRect().top - (window.innerWidth <= 620 ? 22 : 14)
+          : 0;
+        window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
       }, 60);
     }
 
