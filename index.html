@@ -1617,16 +1617,6 @@
     }
 
 
-    .workspace-shell {
-      scroll-margin-top: 18px;
-    }
-
-    @media (max-width: 620px) {
-      .workspace-shell {
-        scroll-margin-top: 26px;
-      }
-    }
-
 </style>
 </head>
 <body>
@@ -3417,11 +3407,11 @@ function clearSelections() {
 
       updateTopResetVisibility();
       setTimeout(() => {
-        const targetTop = workspaceShell
-          ? window.pageYOffset + workspaceShell.getBoundingClientRect().top - (window.innerWidth <= 620 ? 22 : 14)
-          : 0;
-        window.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-      }, 60);
+        const targetPanel = document.querySelector('.panel.left');
+        if (targetPanel) {
+          targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 120);
     }
 
     mainGrid.addEventListener('click', (event) => {
