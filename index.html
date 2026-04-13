@@ -1532,6 +1532,10 @@
       margin-top: 8px;
       font-weight: 700;
       color: #cbd5e1;
+      white-space: nowrap;
+      font-size: clamp(0.72rem, 2.6vw, 1rem);
+      line-height: 1.25;
+      letter-spacing: -0.01em;
     }
 
     .bulk-replay-btn,
@@ -1583,6 +1587,10 @@
       .home-footer-note {
         padding-top: 14px;
         font-size: 0.82rem;
+      }
+
+      .home-footer-note .home-footer-meta {
+        font-size: clamp(0.7rem, 2.9vw, 0.92rem);
       }
 
       .bulk-replay-btn,
@@ -1729,9 +1737,7 @@
       <div>
         This prototype is independently developed and is not affiliated with or endorsed by any official lottery operator.
       </div>
-      <div class="home-footer-meta">
-        <div style="white-space: nowrap; overflow-x: auto;">Results are based on real historical lottery draw data. Last updated: 05/04/2026</div>
-      </div>
+      <div class="home-footer-meta" id="homeFooterMeta">Real draw data • Updated: 05/04/2026</div>
     </div>
 
     <section class="grid workspace-shell hidden" id="workspaceShell">
@@ -2060,6 +2066,7 @@ async function loadLottoData() {
         const lottoData = await loadLottoData();
         games.lotto.draws = lottoData;
         buildDrawEngine();
+        updateHomeFooterDate();
       } finally {
         document.getElementById('checkBtn').disabled = false;
         document.getElementById('runChallengeBtn').disabled = false;
@@ -2172,6 +2179,20 @@ function pickFromPool(pool, count) {
       const year = d.getFullYear();
       return `${day}/${month}/${year}`;
     }
+
+    function updateHomeFooterDate() {
+      const footerMeta = document.getElementById('homeFooterMeta');
+      if (!footerMeta) return;
+
+      const allDates = Object.values(games)
+        .flatMap(game => (game.draws || []).map(draw => draw?.date).filter(Boolean))
+        .filter(Boolean)
+        .sort();
+
+      const latestDate = allDates.length ? allDates[allDates.length - 1] : null;
+      footerMeta.textContent = `Real draw data • Updated: ${latestDate ? formatDate(latestDate) : '05/04/2026'}`;
+    }
+
 
 
     function setHistoryResultsDimmed(dimmed = true) {
@@ -3421,6 +3442,7 @@ function clearSelections() {
       applyEntryMode();
       renderPickerNumbers();
       refreshHeavyPanels();
+      updateHomeFooterDate();
       resetHistoryBox();
       resetPickerBox();
       resetChallengeBox();
@@ -3668,6 +3690,7 @@ function clearSelections() {
       await initialiseLottoData();
       setStartMode('launch');
       renderGame();
+      updateHomeFooterDate();
       updateResultsVisibility('stats');
       if (workspaceShell) workspaceShell.classList.add('hidden');
       expandHomeEntry();
