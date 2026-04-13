@@ -2895,8 +2895,6 @@ function renderDashboardResults(opts) {
         </summary>
         <div class="stats-list">${breakdownRows}</div>
       </details>
-
-      <button class="bulk-replay-btn" id="bulkReplayBtn" type="button">↻ Replay</button>
     </div>
   `;
 }
@@ -3319,7 +3317,7 @@ function runPickerCheck() {
           <div class="label">Total prize winnings</div>
           <div class="value">${formatMoney(totalWinnings)}</div>
         </div>
-        <div class="mini-stat">
+        <div class="mini-stat" style="grid-column: span 2;">
           <div class="label">Jackpot wins</div>
           <div class="value">${jackpotWins.toLocaleString()}</div>
         </div>
