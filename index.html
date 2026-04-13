@@ -258,7 +258,6 @@
       }
     }
 
-
     /* Refined home cards: image on top, title below */
     .home-cards {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -301,23 +300,29 @@
     .feature-card::before,
     .feature-card::after {
       content: none !important;
+      display: none !important;
     }
 
     .feature-card .card-image {
+      width: 100%;
       height: 138px;
+      display: block;
       background-position: center;
       background-repeat: no-repeat;
       background-size: cover;
       transition: transform 0.28s ease, filter 0.28s ease;
       border-bottom: 1px solid rgba(255,255,255,0.08);
       position: relative;
+      flex: 0 0 138px;
+      background-color: rgba(15, 23, 42, 0.35);
     }
 
     .feature-card .card-image::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(5,10,22,0.08) 0%, rgba(5,10,22,0.28) 100%);
+      background: linear-gradient(180deg, rgba(5,10,22,0.06) 0%, rgba(5,10,22,0.22) 100%);
+      pointer-events: none;
     }
 
     .feature-card:hover .card-image,
@@ -331,6 +336,7 @@
       padding: 14px 16px;
       min-height: 70px;
       background: linear-gradient(180deg, rgba(14,20,35,0.94) 0%, rgba(9,14,26,0.98) 100%);
+      flex: 1 1 auto;
     }
 
     .feature-card .card-text h3 {
@@ -373,22 +379,22 @@
     }
 
     .feature-card[data-feature="check"] .card-image {
-      background-image: url('images/your_numbers.jpg');
+      background-image: url('images/your_numbers.jpg') !important;
       filter: saturate(0.96) brightness(0.82);
     }
 
     .feature-card[data-feature="challenge"] .card-image {
-      background-image: url('images/bulk_buy.jpg');
+      background-image: url('images/bulk_buy.jpg') !important;
       filter: saturate(0.92) brightness(0.82);
     }
 
     .feature-card[data-feature="picker"] .card-image {
-      background-image: url('images/number_generator.jpg');
+      background-image: url('images/number_generator.jpg') !important;
       filter: saturate(1.02) brightness(0.82);
     }
 
     .feature-card[data-feature="ticket"] .card-image {
-      background-image: url('images/draw_history.jpg');
+      background-image: url('images/draw_history.jpg') !important;
       filter: saturate(0.76) brightness(0.68);
     }
 
@@ -404,6 +410,7 @@
 
       .feature-card .card-image {
         height: 124px;
+        flex-basis: 124px;
       }
 
       .feature-card .card-text {
@@ -423,7 +430,8 @@
       }
     }
 
-    .grid {
+
+.grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
       gap: 18px;
