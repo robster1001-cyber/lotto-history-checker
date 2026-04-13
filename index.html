@@ -207,24 +207,24 @@
     }
 
     .feature-card[data-feature="check"]::before {
-      background-image: url('images/your_numbers.jpg');
+      background-image: url('your_numbers.jpg');
       background-position: center;
     }
 
     .feature-card[data-feature="challenge"]::before {
-      background-image: url('images/bulk_buy.jpg');
+      background-image: url('bulk_buy.jpg');
       background-position: center;
       filter: saturate(0.92) brightness(0.84);
     }
 
     .feature-card[data-feature="picker"]::before {
-      background-image: url('images/number_generator.jpg');
+      background-image: url('number_generator.jpg');
       background-position: center;
       filter: saturate(1.02) brightness(0.9);
     }
 
     .feature-card[data-feature="ticket"]::before {
-      background-image: url('images/draw_history.jpg');
+      background-image: url('draw_history.jpg');
       background-position: center;
       filter: saturate(0.78) brightness(0.7);
     }
@@ -1779,119 +1779,6 @@
       pointer-events: none;
     }
 
-
-    /* Safer v2 home cards: keep working image backgrounds, put title in solid bottom bar */
-    .feature-card.feature-card-v2 {
-      min-height: 210px !important;
-      padding: 0 !important;
-      display: flex !important;
-      flex-direction: column !important;
-      justify-content: flex-end !important;
-      overflow: hidden;
-      position: relative;
-      opacity: 1 !important;
-      filter: none !important;
-    }
-
-    .feature-card.feature-card-v2 .icon,
-    .feature-card.feature-card-v2 p {
-      display: none !important;
-    }
-
-    .feature-card.feature-card-v2::before {
-      inset: 0 !important;
-      background-size: cover !important;
-      background-position: center !important;
-      background-repeat: no-repeat !important;
-      transform: scale(1.02);
-      z-index: 0 !important;
-    }
-
-    .feature-card.feature-card-v2::after {
-      content: '' !important;
-      position: absolute !important;
-      inset: 0 !important;
-      background: linear-gradient(180deg, rgba(5,10,22,0.10) 0%, rgba(5,10,22,0.18) 50%, rgba(5,10,22,0.34) 100%) !important;
-      z-index: 1 !important;
-      pointer-events: none;
-    }
-
-    .feature-card.feature-card-v2:hover::before,
-    .feature-card.feature-card-v2.active::before {
-      transform: scale(1.06);
-    }
-
-    .feature-card.feature-card-v2 .card-bottom-bar {
-      position: relative;
-      z-index: 3;
-      margin-top: auto;
-      min-height: 68px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: linear-gradient(180deg, rgba(10,15,28,0.94) 0%, rgba(6,10,20,0.98) 100%);
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .feature-card.feature-card-v2 h3 {
-      margin: 0 !important;
-      font-size: 1rem !important;
-      line-height: 1.15 !important;
-      color: #f8fafc !important;
-      text-shadow: none !important;
-      max-width: calc(100% - 38px);
-    }
-
-    .card-help {
-      width: 24px;
-      height: 24px;
-      min-width: 24px;
-      padding: 0;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
-      color: #cbd5e1;
-      font-size: 0.82rem;
-      font-weight: 800;
-      line-height: 1;
-      cursor: help;
-      box-shadow: none;
-      transform: none !important;
-      z-index: 4;
-    }
-
-    .card-help:hover {
-      background: rgba(255,255,255,0.12);
-      border-color: rgba(255,255,255,0.24);
-    }
-
-    @media (max-width: 620px) {
-      .feature-card.feature-card-v2 {
-        min-height: 196px !important;
-      }
-
-      .feature-card.feature-card-v2 .card-bottom-bar {
-        min-height: 62px;
-        padding: 12px 14px;
-      }
-
-      .feature-card.feature-card-v2 h3 {
-        font-size: 0.98rem !important;
-      }
-
-      .card-help {
-        width: 22px;
-        height: 22px;
-        min-width: 22px;
-        font-size: 0.78rem;
-      }
-    }
-
 </style>
 </head>
 <body>
@@ -1912,29 +1799,25 @@
 
     
     <section class="home-cards home-entry" id="homeCardsSection">
-      <div class="card feature-card feature-card-v2" data-feature="check">
-        <div class="card-bottom-bar">
-          <h3>Your Numbers</h3>
-          <button class="card-help" type="button" aria-label="About Your Numbers" title="Check your chosen numbers against the full historical draw data.">?</button>
-        </div>
+      <div class="card feature-card" data-feature="check">
+        <div class="icon">🎰</div>
+        <h3>Your Numbers</h3>
+        <p>Have they ever done anything?</p>
       </div>
-      <div class="card feature-card feature-card-v2" data-feature="challenge">
-        <div class="card-bottom-bar">
-          <h3>Bulk Buy</h3>
-          <button class="card-help" type="button" aria-label="About Bulk Buy" title="Run loads of random tickets instantly and see how brutal the historical results really are.">?</button>
-        </div>
+      <div class="card feature-card" data-feature="challenge">
+        <div class="icon">🎲</div>
+        <h3>Bulk Buy<br><span style="font-size:inherit;font-weight:inherit;color:inherit;">(no charge 😉)</span></h3>
+        <p>Watch the chaos unfold.</p>
       </div>
-      <div class="card feature-card feature-card-v2" data-feature="picker">
-        <div class="card-bottom-bar">
-          <h3>Number Generator</h3>
-          <button class="card-help" type="button" aria-label="About Number Generator" title="Generate a line using different play styles, then test it before you copy it.">?</button>
-        </div>
+      <div class="card feature-card" data-feature="picker">
+        <div class="icon">🧠</div>
+        <h3>Number Generator</h3>
+        <p>Generate. Test. Repeat.</p>
       </div>
-      <div class="card feature-card feature-card-v2 reveal-card" data-feature="ticket">
-        <div class="card-bottom-bar">
-          <h3>Draw History</h3>
-          <button class="card-help" type="button" aria-label="About Draw History" title="Browse the winning numbers by year using the real historical draw archive.">?</button>
-        </div>
+      <div class="card feature-card reveal-card" data-feature="ticket">
+        <div class="icon">📜</div>
+        <h3>Draw History</h3>
+        <p>Where the numbers actually landed.</p>
       </div>
     </section>
 
