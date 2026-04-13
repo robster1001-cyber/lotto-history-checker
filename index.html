@@ -30,6 +30,9 @@
       max-width: 1150px;
       margin: 0 auto;
       padding: 24px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     .hero {
@@ -1516,6 +1519,42 @@
       text-align: center;
     }
 
+    .home-footer-note {
+      margin-top: auto;
+      padding: 20px 4px 10px;
+      color: var(--muted);
+      font-size: 0.86rem;
+      line-height: 1.55;
+      text-align: center;
+    }
+
+    .home-footer-note .home-footer-meta {
+      margin-top: 8px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+
+    .bulk-replay-btn,
+    .ticket-top-btn {
+      position: sticky;
+      bottom: 14px;
+      margin-top: 14px;
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.94);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #dbeafe;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+      font-weight: 800;
+    }
+
     @media (max-width: 620px) {
       .hero-art img {
         width: calc(100% + 32px);
@@ -1539,6 +1578,17 @@
       .bottom-note-home {
         padding-top: 12px;
         font-size: 0.86rem;
+      }
+
+      .home-footer-note {
+        padding-top: 14px;
+        font-size: 0.82rem;
+      }
+
+      .bulk-replay-btn,
+      .ticket-top-btn {
+        bottom: 10px;
+        padding: 11px 14px;
       }
     }
 
@@ -1675,13 +1725,13 @@
       </div>
     </section>
 
-    <div class="home-entry" id="homeFooterNote" style="text-align:center; margin:20px 0 10px; color:#9aa4b2; font-size:0.85rem; line-height:1.5;">
-      <div style="margin-bottom:8px;">
-This prototype is independently developed and is not affiliated with or endorsed by any official lottery operator.
-</div>
-<div style="font-weight:700; color:#cbd5e1;">
-Results are based on real historical lottery draw data.
-</div>
+    <div class="home-entry home-footer-note" id="homeFooterNote">
+      <div>
+        This prototype is independently developed and is not affiliated with or endorsed by any official lottery operator.
+      </div>
+      <div class="home-footer-meta">
+        Results are based on real historical lottery draw data. Last updated: 05/04/2026
+      </div>
     </div>
 
     <section class="grid workspace-shell hidden" id="workspaceShell">
@@ -1853,6 +1903,7 @@ Results are based on real historical lottery draw data.
             <h3>Winning numbers by year</h3>
 </div>
           <div class="draw-history-wrap" id="drawHistoryBox"></div>
+          <button class="ticket-top-btn" id="ticketTopBtn" type="button">↑ Top</button>
         </div>
       </div>
 
@@ -2054,6 +2105,7 @@ async function loadLottoData() {
     const topResetBtn = document.getElementById('topResetBtn');
     const homeCardsSection = document.getElementById('homeCardsSection');
     const homeFooterNote = document.getElementById('homeFooterNote');
+    const ticketTopBtn = document.getElementById('ticketTopBtn');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -2843,6 +2895,8 @@ function renderDashboardResults(opts) {
         </summary>
         <div class="stats-list">${breakdownRows}</div>
       </details>
+
+      <button class="bulk-replay-btn" id="bulkReplayBtn" type="button">↻ Replay</button>
     </div>
   `;
 }
@@ -3188,6 +3242,7 @@ function runPickerCheck() {
 
   let bestMatch = 0;
   let totalWinnings = 0;
+  let jackpotWins = 0;
   let bestTicketDate = null;
   let bestTicketNumbers = null;
   let bestTicketMatchedNumbers = null;
@@ -3213,6 +3268,7 @@ function runPickerCheck() {
       }
 
       if (m > 0) challengeBuckets[m] = (challengeBuckets[m] || 0) + 1;
+      if (m === game.mainCount) jackpotWins++;
       totalWinnings += (prizeTable[m] || 0);
     }
 
@@ -3262,6 +3318,10 @@ function runPickerCheck() {
         <div class="mini-stat">
           <div class="label">Total prize winnings</div>
           <div class="value">${formatMoney(totalWinnings)}</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Jackpot wins</div>
+          <div class="value">${jackpotWins.toLocaleString()}</div>
         </div>
       </div>
 
@@ -3365,6 +3425,16 @@ function clearSelections() {
     }
 
 
+
+    function resetToHomeAndScroll() {
+      if (workspaceShell) workspaceShell.classList.add('hidden');
+      expandHomeEntry();
+      document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('active'));
+      if (topResetBtn) topResetBtn.classList.add('hidden');
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
 
     function collapseHomeEntry() {
       if (homeCardsSection) homeCardsSection.classList.add('collapsed');
@@ -3560,11 +3630,8 @@ function clearSelections() {
 
     if (resultsBackTopBtn) {
       resultsBackTopBtn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        setTimeout(() => {
-          fullyResetToHome();
-        }, 420);
+        fullyResetToHome();
+        resetToHomeAndScroll();
       });
     }
 
@@ -3575,8 +3642,22 @@ function clearSelections() {
     if (topResetBtn) {
       topResetBtn.addEventListener('click', () => {
         fullyResetToHome();
+        resetToHomeAndScroll();
       });
     }
+
+    if (ticketTopBtn) {
+      ticketTopBtn.addEventListener('click', () => {
+        fullyResetToHome();
+        resetToHomeAndScroll();
+      });
+    }
+
+    challengeResultsBox.addEventListener('click', (event) => {
+      const replayBtn = event.target.closest('#bulkReplayBtn');
+      if (!replayBtn) return;
+      runChallenge();
+    });
 
     window.addEventListener('scroll', updateTopResetVisibility, { passive: true });
     window.addEventListener('resize', updateTopResetVisibility);
