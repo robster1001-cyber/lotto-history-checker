@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>Lotto History Checker</title>
   <style>
+    /* Cleaned mobile CSS block so image-card styles parse reliably */
     :root {
       --bg: #0f172a;
       --card: #1e293b;
@@ -1222,25 +1223,22 @@
     min-height: 48px;
   }
 
-@media (max-width: 620px) {
   .home-cards {
     gap: 8px;
     margin-bottom: 12px;
   }
 
   .feature-card {
-      transform: scale(1);
-      font-weight:600;
-
+    transform: scale(1);
+    font-weight: 600;
     min-height: 92px;
     padding: 12px 14px;
     border-radius: 16px;
   }
 
   .feature-card h3 {
-      font-weight:800;
-      letter-spacing:0.3px;
-
+    font-weight: 800;
+    letter-spacing: 0.3px;
     margin: 0 0 4px;
     font-size: 0.95rem;
     line-height: 1.15;
