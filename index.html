@@ -207,24 +207,24 @@
     }
 
     .feature-card[data-feature="check"]::before {
-      background-image: url('your_numbers.jpg');
+      background-image: url('images/your_numbers.jpg');
       background-position: center;
     }
 
     .feature-card[data-feature="challenge"]::before {
-      background-image: url('bulk_buy.jpg');
+      background-image: url('images/bulk_buy.jpg');
       background-position: center;
       filter: saturate(0.92) brightness(0.84);
     }
 
     .feature-card[data-feature="picker"]::before {
-      background-image: url('number_generator.jpg');
+      background-image: url('images/number_generator.jpg');
       background-position: center;
       filter: saturate(1.02) brightness(0.9);
     }
 
     .feature-card[data-feature="ticket"]::before {
-      background-image: url('draw_history.jpg');
+      background-image: url('images/draw_history.jpg');
       background-position: center;
       filter: saturate(0.78) brightness(0.7);
     }
@@ -255,6 +255,171 @@
     @media (max-width: 620px) {
       .feature-card::before {
         transform: scale(1.04);
+      }
+    }
+
+
+    /* Refined home cards: image on top, title below */
+    .home-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .feature-card {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      min-height: 210px;
+      padding: 0;
+      opacity: 1;
+      filter: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(18,26,43,0.98) 100%);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-3px);
+      opacity: 1;
+      box-shadow: 0 14px 32px rgba(0,0,0,0.24);
+    }
+
+    .feature-card.active {
+      outline: 2px solid rgba(255,255,255,0.12);
+      box-shadow: 0 0 0 2px rgba(96,165,250,0.18), 0 16px 34px rgba(0,0,0,0.28);
+    }
+
+    .feature-card .icon,
+    .feature-card p {
+      display: none !important;
+    }
+
+    .feature-card::before,
+    .feature-card::after {
+      content: none !important;
+    }
+
+    .feature-card .card-image {
+      height: 138px;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      transition: transform 0.28s ease, filter 0.28s ease;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+    }
+
+    .feature-card .card-image::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(5,10,22,0.08) 0%, rgba(5,10,22,0.28) 100%);
+    }
+
+    .feature-card:hover .card-image,
+    .feature-card.active .card-image {
+      transform: scale(1.04);
+    }
+
+    .feature-card .card-text {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      min-height: 70px;
+      background: linear-gradient(180deg, rgba(14,20,35,0.94) 0%, rgba(9,14,26,0.98) 100%);
+    }
+
+    .feature-card .card-text h3 {
+      margin: 0;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      color: #f8fafc;
+      text-shadow: none;
+    }
+
+    .card-help {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      padding: 0;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: #cbd5e1;
+      font-size: 0.82rem;
+      font-weight: 800;
+      line-height: 1;
+      cursor: help;
+      box-shadow: none;
+      transform: none !important;
+    }
+
+    .card-help:hover {
+      background: rgba(255,255,255,0.12);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .feature-card[data-feature="check"] .card-image {
+      background-image: url('images/your_numbers.jpg');
+      filter: saturate(0.96) brightness(0.82);
+    }
+
+    .feature-card[data-feature="challenge"] .card-image {
+      background-image: url('images/bulk_buy.jpg');
+      filter: saturate(0.92) brightness(0.82);
+    }
+
+    .feature-card[data-feature="picker"] .card-image {
+      background-image: url('images/number_generator.jpg');
+      filter: saturate(1.02) brightness(0.82);
+    }
+
+    .feature-card[data-feature="ticket"] .card-image {
+      background-image: url('images/draw_history.jpg');
+      filter: saturate(0.76) brightness(0.68);
+    }
+
+    @media (max-width: 620px) {
+      .home-cards {
+        gap: 12px;
+      }
+
+      .feature-card {
+        min-height: 196px;
+        border-radius: 18px;
+      }
+
+      .feature-card .card-image {
+        height: 124px;
+      }
+
+      .feature-card .card-text {
+        min-height: 62px;
+        padding: 12px 14px;
+      }
+
+      .feature-card .card-text h3 {
+        font-size: 0.98rem;
+      }
+
+      .card-help {
+        width: 22px;
+        height: 22px;
+        min-width: 22px;
+        font-size: 0.78rem;
       }
     }
 
@@ -1800,24 +1965,28 @@
     
     <section class="home-cards home-entry" id="homeCardsSection">
       <div class="card feature-card" data-feature="check">
-        <div class="icon">🎰</div>
-        <h3>Your Numbers</h3>
-        <p>Have they ever done anything?</p>
+        <div class="card-image" aria-hidden="true"></div>
+        <div class="card-text">
+          <h3>Your Numbers <button class="card-help" type="button" aria-label="About Your Numbers" title="Check your chosen numbers against the full historical draw data.">?</button></h3>
+        </div>
       </div>
       <div class="card feature-card" data-feature="challenge">
-        <div class="icon">🎲</div>
-        <h3>Bulk Buy<br><span style="font-size:inherit;font-weight:inherit;color:inherit;">(no charge 😉)</span></h3>
-        <p>Watch the chaos unfold.</p>
+        <div class="card-image" aria-hidden="true"></div>
+        <div class="card-text">
+          <h3>Bulk Buy <button class="card-help" type="button" aria-label="About Bulk Buy" title="Run loads of random tickets instantly and see how brutal the historical results really are.">?</button></h3>
+        </div>
       </div>
       <div class="card feature-card" data-feature="picker">
-        <div class="icon">🧠</div>
-        <h3>Number Generator</h3>
-        <p>Generate. Test. Repeat.</p>
+        <div class="card-image" aria-hidden="true"></div>
+        <div class="card-text">
+          <h3>Number Generator <button class="card-help" type="button" aria-label="About Number Generator" title="Generate a line using different play styles, then test it before you copy it.">?</button></h3>
+        </div>
       </div>
       <div class="card feature-card reveal-card" data-feature="ticket">
-        <div class="icon">📜</div>
-        <h3>Draw History</h3>
-        <p>Where the numbers actually landed.</p>
+        <div class="card-image" aria-hidden="true"></div>
+        <div class="card-text">
+          <h3>Draw History <button class="card-help" type="button" aria-label="About Draw History" title="Browse the winning numbers by year using the real historical draw archive.">?</button></h3>
+        </div>
       </div>
     </section>
 
