@@ -3795,6 +3795,19 @@ function clearSelections() {
     document.querySelectorAll('.feature-card').forEach(card => {
       card.addEventListener('click', () => switchFeature(card.dataset.feature));
     });
+
+    document.querySelectorAll('.card-help').forEach(btn => {
+      const stopCardOpen = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      };
+
+      btn.addEventListener('click', stopCardOpen);
+      btn.addEventListener('touchstart', stopCardOpen, { passive: false });
+      btn.addEventListener('touchend', stopCardOpen, { passive: false });
+      btn.addEventListener('pointerdown', stopCardOpen);
+      btn.addEventListener('pointerup', stopCardOpen);
+    });
     document.getElementById('startLaunchBtn').addEventListener('click', () => setStartMode('launch'));
     document.getElementById('start18Btn').addEventListener('click', () => setStartMode('18'));
     document.getElementById('startCustomBtn').addEventListener('click', () => setStartMode('custom'));
