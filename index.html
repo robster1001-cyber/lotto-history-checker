@@ -1736,11 +1736,11 @@
 
     .top-reset-btn {
       position: sticky;
-      top: 10px;
+      top: 8px;
       left: 0;
       z-index: 60;
-      margin: 8px 0 14px 8px;
       align-self: flex-start;
+      margin: 6px 0 14px 6px;
       padding: 10px 14px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.94);
@@ -1757,8 +1757,8 @@
 
     @media (max-width: 620px) {
       .top-reset-btn {
-        top: 8px;
-        margin: 6px 0 12px 6px;
+        top: 6px;
+        margin: 4px 0 12px 4px;
         padding: 10px 12px;
         font-size: 0.92rem;
       }
@@ -1910,6 +1910,72 @@
       }
     }
 
+
+    .home-card-help-panel {
+      margin: 0 0 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #dbeafe;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.22);
+      line-height: 1.45;
+    }
+
+    .home-card-help-panel.hidden {
+      display: none !important;
+    }
+
+    .home-card-help-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+
+    .home-card-help-title strong {
+      color: #ffffff;
+      font-size: 0.98rem;
+    }
+
+    .home-card-help-close {
+      min-width: 34px;
+      height: 34px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: #e2e8f0;
+      font-weight: 800;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .home-card-help-close:hover {
+      transform: none !important;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .card-help.active {
+      background: rgba(96,165,250,0.18);
+      border-color: rgba(96,165,250,0.34);
+      color: #ffffff;
+    }
+
+    @media (max-width: 620px) {
+      .home-card-help-panel {
+        margin: 0 0 14px;
+        padding: 12px 14px;
+        border-radius: 14px;
+      }
+
+      .home-card-help-close {
+        min-width: 32px;
+        height: 32px;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -1932,28 +1998,36 @@
       <div class="card feature-card feature-card-clean" data-feature="check">
         <div class="card-bottom-bar">
           <h3>Your Numbers</h3>
-          <button class="card-help" type="button" aria-label="About Your Numbers" title="Check your chosen numbers against the full historical draw data.">?</button>
+          <button class="card-help" type="button" aria-label="About Your Numbers" data-help-title="Your Numbers" data-help-text="Check your chosen numbers against the full historical draw data and see whether your so-called lucky line has ever actually done anything.">?</button>
         </div>
       </div>
       <div class="card feature-card feature-card-clean" data-feature="challenge">
         <div class="card-bottom-bar">
           <h3>Bulk Buy</h3>
-          <button class="card-help" type="button" aria-label="About Bulk Buy" title="Run loads of random tickets instantly and see how brutal the historical results really are.">?</button>
+          <button class="card-help" type="button" aria-label="About Bulk Buy" data-help-title="Bulk Buy" data-help-text="Run loads of random tickets instantly and see how much pain your imaginary spending would have caused across the real draw history.">?</button>
         </div>
       </div>
       <div class="card feature-card feature-card-clean" data-feature="picker">
         <div class="card-bottom-bar">
           <h3>Number Generator</h3>
-          <button class="card-help" type="button" aria-label="About Number Generator" title="Generate a line using different play styles, then test it before you copy it.">?</button>
+          <button class="card-help" type="button" aria-label="About Number Generator" data-help-title="Number Generator" data-help-text="Generate a line using different styles like hot, cold, overdue or chaos, then test it here before you copy it for the real thing.">?</button>
         </div>
       </div>
       <div class="card feature-card feature-card-clean reveal-card" data-feature="ticket">
         <div class="card-bottom-bar">
           <h3>Draw History</h3>
-          <button class="card-help" type="button" aria-label="About Draw History" title="Browse the winning numbers by year using the real historical draw archive.">?</button>
+          <button class="card-help" type="button" aria-label="About Draw History" data-help-title="Draw History" data-help-text="Browse the real winning numbers by year and see exactly where the balls actually landed over time.">?</button>
         </div>
       </div>
     </section>
+
+    <div class="home-entry home-card-help-panel hidden" id="homeCardHelpPanel">
+      <div class="home-card-help-title">
+        <strong id="homeCardHelpTitle">Quick help</strong>
+        <button class="home-card-help-close" id="homeCardHelpClose" type="button" aria-label="Close help">Done</button>
+      </div>
+      <div id="homeCardHelpBody">Tap a question mark to see what that tab does.</div>
+    </div>
 
     <div class="home-entry home-footer-note" id="homeFooterNote">
       <div>
@@ -2335,6 +2409,10 @@ async function loadLottoData() {
     const homeCardsSection = document.getElementById('homeCardsSection');
     const homeFooterNote = document.getElementById('homeFooterNote');
     const ticketTopBtn = document.getElementById('ticketTopBtn');
+    const homeCardHelpPanel = document.getElementById('homeCardHelpPanel');
+    const homeCardHelpTitle = document.getElementById('homeCardHelpTitle');
+    const homeCardHelpBody = document.getElementById('homeCardHelpBody');
+    const homeCardHelpClose = document.getElementById('homeCardHelpClose');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -3713,6 +3791,26 @@ function clearSelections() {
       topResetBtn.classList.toggle('hidden', !(workspaceVisible && nearTop));
     }
 
+
+    function openHomeCardHelp(title, text, triggerBtn = null) {
+      if (!homeCardHelpPanel || !homeCardHelpTitle || !homeCardHelpBody) return;
+      homeCardHelpTitle.textContent = title || 'Quick help';
+      homeCardHelpBody.textContent = text || '';
+      homeCardHelpPanel.classList.remove('hidden');
+      document.querySelectorAll('.card-help').forEach(btn => btn.classList.remove('active'));
+      if (triggerBtn) triggerBtn.classList.add('active');
+
+      setTimeout(() => {
+        homeCardHelpPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 30);
+    }
+
+    function closeHomeCardHelp() {
+      if (!homeCardHelpPanel) return;
+      homeCardHelpPanel.classList.add('hidden');
+      document.querySelectorAll('.card-help').forEach(btn => btn.classList.remove('active'));
+    }
+
     function switchFeature(feature) {
       currentFeature = feature;
       const appRoot = document.querySelector('.app');
@@ -3724,6 +3822,7 @@ function clearSelections() {
         workspaceShell.classList.remove('hidden');
       }
       collapseHomeEntry();
+      closeHomeCardHelp();
 
       document.querySelectorAll('.feature-card').forEach(card => {
         card.classList.toggle('active', card.dataset.feature === feature);
@@ -3798,16 +3897,35 @@ function clearSelections() {
     });
 
     document.querySelectorAll('.card-help').forEach(btn => {
-      const stopCardOpen = (event) => {
+      const openHelp = (event) => {
         event.preventDefault();
         event.stopPropagation();
+        openHomeCardHelp(btn.dataset.helpTitle, btn.dataset.helpText, btn);
       };
 
-      btn.addEventListener('click', stopCardOpen);
-      btn.addEventListener('touchstart', stopCardOpen, { passive: false });
-      btn.addEventListener('touchend', stopCardOpen, { passive: false });
-      btn.addEventListener('pointerdown', stopCardOpen);
-      btn.addEventListener('pointerup', stopCardOpen);
+      btn.addEventListener('click', openHelp);
+      btn.addEventListener('touchstart', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }, { passive: false });
+      btn.addEventListener('touchend', openHelp, { passive: false });
+      btn.addEventListener('pointerdown', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      });
+    });
+
+    if (homeCardHelpClose) {
+      homeCardHelpClose.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeHomeCardHelp();
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      if (!event.target.closest('.card-help') && !event.target.closest('#homeCardHelpPanel')) {
+        closeHomeCardHelp();
+      }
     });
     document.getElementById('startLaunchBtn').addEventListener('click', () => setStartMode('launch'));
     document.getElementById('start18Btn').addEventListener('click', () => setStartMode('18'));
