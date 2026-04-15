@@ -1736,11 +1736,11 @@
 
     .top-reset-btn {
       position: sticky;
-      top: 8px;
+      top: 10px;
       left: 0;
-      z-index: 60;
+      z-index: 80;
       align-self: flex-start;
-      margin: 6px 0 14px 6px;
+      margin: 8px 0 14px 8px;
       padding: 10px 14px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.94);
@@ -1757,8 +1757,8 @@
 
     @media (max-width: 620px) {
       .top-reset-btn {
-        top: 6px;
-        margin: 4px 0 12px 4px;
+        top: 8px;
+        margin: 6px 0 12px 6px;
         padding: 10px 12px;
         font-size: 0.92rem;
       }
@@ -3787,8 +3787,7 @@ function clearSelections() {
     function updateTopResetVisibility() {
       if (!topResetBtn || !workspaceShell) return;
       const workspaceVisible = !workspaceShell.classList.contains('hidden');
-      const nearTop = window.scrollY < 220;
-      topResetBtn.classList.toggle('hidden', !(workspaceVisible && nearTop));
+      topResetBtn.classList.toggle('hidden', !workspaceVisible);
     }
 
 
