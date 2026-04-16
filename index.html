@@ -1975,6 +1975,17 @@
       }
     }
 
+
+    .grid-reveal-glow {
+      animation: gridRevealGlow 0.9s ease;
+    }
+
+    @keyframes gridRevealGlow {
+      0% { box-shadow: 0 0 0 rgba(96,165,250,0); border-color: rgba(255,255,255,0.08); }
+      35% { box-shadow: 0 0 0 3px rgba(96,165,250,0.16), 0 0 22px rgba(96,165,250,0.18); border-color: rgba(96,165,250,0.34); }
+      100% { box-shadow: 0 0 0 rgba(96,165,250,0); border-color: rgba(255,255,255,0.08); }
+    }
+
 </style>
 </head>
 <body>
@@ -2057,12 +2068,12 @@
               <button data-game="setforlife">Set For Life</button>
             </div>
           </div>
-          <div class="selection-summary">
+          <div class="selection-summary hidden" id="checkSelectionSummary">
             <div class="tag" id="mainSummary">Your numbers: none selected</div>
             <div class="tag" id="bonusSummary">Bonus numbers: none selected</div>
           </div>
 
-          <div class="subsection">
+          <div class="subsection hidden" id="checkMainSection">
             <h4 id="mainTitle">Pick your numbers</h4>
             <div id="mainGrid" class="number-grid"></div>
             <div id="mainLineInputs" class="inline-inputs hidden"></div>
@@ -2074,12 +2085,12 @@
             <div id="bonusLineInputs" class="inline-inputs hidden"></div>
           </div>
 
-          <div class="btn-row check-actions">
+          <div class="btn-row check-actions hidden" id="checkActions">
             <button id="checkBtn">Check History</button>
             <button id="clearBtn">Clear</button>
           </div>
 
-          <div class="subsection">
+          <div class="subsection hidden" id="checkDateSection">
             <h4>Check numbers from</h4>
             <div class="toggle-row">
               <button id="startLaunchBtn" class="active-game" type="button">Lottery launch</button>
@@ -2402,6 +2413,7 @@ async function loadEuromillionsData() {
     let startMode = 'launch';
     let challengeTickets = 10;
     let challengeRunStatusTimer = null;
+    let checkGameChosen = false;
 
     const mainGrid = document.getElementById('mainGrid');
     const bonusGrid = document.getElementById('bonusGrid');
@@ -2435,6 +2447,10 @@ async function loadEuromillionsData() {
     const homeCardHelpTitle = document.getElementById('homeCardHelpTitle');
     const homeCardHelpBody = document.getElementById('homeCardHelpBody');
     const homeCardHelpClose = document.getElementById('homeCardHelpClose');
+    const checkSelectionSummary = document.getElementById('checkSelectionSummary');
+    const checkMainSection = document.getElementById('checkMainSection');
+    const checkActions = document.getElementById('checkActions');
+    const checkDateSection = document.getElementById('checkDateSection');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -3753,13 +3769,31 @@ function clearSelections() {
       resetChallengeBox();
     }
 
+
+    function flashGrid(container) {
+      if (!container) return;
+      container.classList.remove('grid-reveal-glow');
+      void container.offsetWidth;
+      container.classList.add('grid-reveal-glow');
+      setTimeout(() => container.classList.remove('grid-reveal-glow'), 950);
+    }
+
+    function setCheckGameSelectionState(chosen) {
+      checkGameChosen = chosen;
+      if (checkSelectionSummary) checkSelectionSummary.classList.toggle('hidden', !chosen);
+      if (checkMainSection) checkMainSection.classList.toggle('hidden', !chosen);
+      if (checkActions) checkActions.classList.toggle('hidden', !chosen);
+      if (checkDateSection) checkDateSection.classList.toggle('hidden', !chosen);
+      const hasBonus = chosen && games[currentGame] && games[currentGame].bonusCount > 0;
+      document.getElementById('bonusSection').classList.toggle('hidden', !hasBonus);
+    }
+
     function renderGame() {
       const game = games[currentGame];
       const hasBonus = game.bonusCount > 0;
 
       mainTitle.textContent = `Pick ${game.mainCount} main number${game.mainCount > 1 ? 's' : ''}`;
       bonusTitle.textContent = hasBonus ? `Pick ${game.bonusCount} ${game.bonusLabel.toLowerCase()}` : 'No bonus number required';
-      document.getElementById('bonusSection').classList.toggle('hidden', !hasBonus);
 
       selectedMain = [];
       selectedBonus = [];
@@ -3773,6 +3807,15 @@ function clearSelections() {
       resetHistoryBox();
       resetPickerBox();
       resetChallengeBox();
+
+      if (currentFeature === 'check') {
+        setCheckGameSelectionState(checkGameChosen);
+        if (checkGameChosen) {
+          flashGrid(mainGrid);
+        }
+      } else {
+        setCheckGameSelectionState(true);
+      }
     }
 
 
@@ -3802,6 +3845,7 @@ function clearSelections() {
       clearChallengeSelections();
       setStartMode('launch');
       currentGame = 'lotto';
+      checkGameChosen = false;
       document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
       document.querySelectorAll('[data-game="lotto"]').forEach(x => x.classList.add('active-game'));
       renderGame();
@@ -3868,6 +3912,11 @@ function clearSelections() {
 
       panelTitle.textContent = labels[feature][0];
       panelSubtitle.textContent = labels[feature][1];
+      if (feature === 'check') {
+        checkGameChosen = false;
+        document.querySelectorAll('#checkSection [data-game]').forEach(btn => btn.classList.remove('active-game'));
+        setCheckGameSelectionState(false);
+      }
       updateResultsVisibility(feature);
       if (feature !== 'picker') closePickerHelp();
 
@@ -3898,6 +3947,7 @@ function clearSelections() {
         setTimeout(() => {
           const bonusSection = document.getElementById('bonusSection');
           if (bonusSection) bonusSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          flashGrid(bonusGrid);
         }, 80);
       }
     });
@@ -3916,9 +3966,15 @@ function clearSelections() {
 
     document.querySelectorAll('[data-game]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
-        btn.classList.add('active-game');
+        const inCheckSection = !!btn.closest('#checkSection');
+        document.querySelectorAll('[data-game="' + btn.dataset.game + '"]').forEach(x => x.classList.add('active-game'));
+        document.querySelectorAll('[data-game]').forEach(x => {
+          if (x.dataset.game !== btn.dataset.game) x.classList.remove('active-game');
+        });
         currentGame = btn.dataset.game;
+        if (inCheckSection) {
+          checkGameChosen = true;
+        }
         closePickerHelp();
         renderGame();
       });
