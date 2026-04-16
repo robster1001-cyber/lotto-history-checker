@@ -2054,8 +2054,8 @@
       align-items: baseline;
       justify-content: space-between;
       gap: 12px;
-      flex-wrap: wrap;
       margin-bottom: 10px;
+      flex-wrap: wrap;
     }
 
     .challenge-slider-value {
@@ -2284,10 +2284,10 @@
           <div class="button-group-shell">
             <div class="section-label">Lottery game</div>
             <div class="game-row" id="challengeGameRow">
-              <button data-challenge-game="lotto">UK Lotto</button>
-              <button data-challenge-game="euromillions">EuroMillions</button>
-              <button data-challenge-game="thunderball">Thunderball</button>
-              <button data-challenge-game="setforlife">Set For Life</button>
+              <button type="button" data-challenge-game="lotto">UK Lotto</button>
+              <button type="button" data-challenge-game="euromillions">EuroMillions</button>
+              <button type="button" data-challenge-game="thunderball">Thunderball</button>
+              <button type="button" data-challenge-game="setforlife">Set For Life</button>
             </div>
           </div>
 
@@ -2298,7 +2298,7 @@
                 <div class="challenge-slider-value" id="challengeTicketValue">10 tickets</div>
                 <div class="challenge-slider-note" id="challengeTicketMood">Feeling cautious 😇</div>
               </div>
-              <input id="ticketSlider" class="challenge-ticket-slider" type="range" min="0" max="5" step="1" value="0" aria-label="Number of random tickets" />
+              <input id="challengeTicketSlider" class="challenge-ticket-slider" type="range" min="0" max="5" step="1" value="0" aria-label="Number of random tickets" />
               <div class="challenge-slider-stops">
                 <span>10</span>
                 <span>50</span>
@@ -2307,12 +2307,12 @@
                 <span>5K</span>
                 <span>10K</span>
               </div>
-              <div class="challenge-game-meta" id="challengeGameMeta">Pick a game to unlock the pain.</div>
+              <div class="challenge-game-meta" id="challengeGameMeta">Choose a game first so we know what kind of damage we are simulating.</div>
             </div>
 
             <div class="btn-row">
-              <button class="primary" id="runChallengeBtn">Play Now</button>
-              <button id="clearChallengeBtn">Clear</button>
+              <button class="primary" id="runChallengeBtn" type="button">Play Now</button>
+              <button id="clearChallengeBtn" type="button">Clear</button>
             </div>
 
             <div class="run-status hidden" id="challengeRunStatus">
@@ -2322,7 +2322,6 @@
         </div>
 
         <div id="pickerSection" class="hidden">
-
 
           <div class="button-group-shell">
             <div class="section-label">Lottery game</div>
@@ -2641,10 +2640,10 @@ async function loadEuromillionsData() {
     const homeCardHelpBody = document.getElementById('homeCardHelpBody');
     const homeCardHelpClose = document.getElementById('homeCardHelpClose');
     const challengeControlsWrap = document.getElementById('challengeControlsWrap');
-    const challengeGameMeta = document.getElementById('challengeGameMeta');
     const challengeTicketValue = document.getElementById('challengeTicketValue');
     const challengeTicketMood = document.getElementById('challengeTicketMood');
-    const ticketSlider = document.getElementById('ticketSlider');
+    const challengeTicketSlider = document.getElementById('challengeTicketSlider');
+    const challengeGameMeta = document.getElementById('challengeGameMeta');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -2734,6 +2733,10 @@ function pickFromPool(pool, count) {
       return value >= 1000 ? `${value.toLocaleString()} tickets` : `${value} tickets`;
     }
 
+    function formatTicketPrice(value) {
+      return `£${value.toFixed(value % 1 ? 2 : 0)}`;
+    }
+
     function getChallengeMood(value) {
       if (value <= 10) return 'Feeling cautious 😇';
       if (value <= 50) return 'Getting brave...';
@@ -2744,8 +2747,8 @@ function pickFromPool(pool, count) {
     }
 
     function syncChallengeSliderUI(pulse = false) {
-      if (!ticketSlider || !challengeTicketValue || !challengeTicketMood) return;
-      const sliderIndex = Number(ticketSlider.value) || 0;
+      if (!challengeTicketSlider || !challengeTicketValue || !challengeTicketMood) return;
+      const sliderIndex = Number(challengeTicketSlider.value) || 0;
       challengeTickets = challengeTicketStops[sliderIndex] || 10;
       challengeTicketValue.textContent = formatTicketCount(challengeTickets);
       challengeTicketMood.textContent = getChallengeMood(challengeTickets);
@@ -2759,8 +2762,7 @@ function pickFromPool(pool, count) {
 
       if (challengeGameMeta && challengeGameChosen) {
         const game = games[currentGame];
-        const price = typeof game.ticketPrice === 'number' ? `£${game.ticketPrice.toFixed(game.ticketPrice % 1 ? 2 : 0)}` : '—';
-        challengeGameMeta.textContent = `${game.label} • ${price} per ticket • From ${game.label} launch`;
+        challengeGameMeta.textContent = `${game.label} • ${formatTicketPrice(game.ticketPrice)} per ticket • From ${game.label} launch`;
       }
     }
 
@@ -3934,7 +3936,7 @@ function runPickerCheck() {
     <div class="kicker">Bulk Buy result</div>
     <h3 style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
       <span>${challengeTickets.toLocaleString()} ${game.label} tickets tested</span>
-      <span style="font-size:0.86rem;font-weight:800;color:var(--muted);padding-top:4px;">From ${game.label} launch • £${ticketPrice.toFixed(ticketPrice % 1 ? 2 : 0)} per ticket</span>
+      <span style="font-size:0.86rem;font-weight:800;color:var(--muted);padding-top:4px;">From ${game.label} launch • ${formatTicketPrice(ticketPrice)} per ticket</span>
     </h3>
     <div class="result-headline">
       <div class="hero-stat ${profitLoss >= 0 ? 'positive' : 'negative'}">
@@ -4022,11 +4024,12 @@ function clearSelections() {
       challengeTickets = 10;
       challengeGameChosen = false;
       currentGame = 'lotto';
-      if (ticketSlider) ticketSlider.value = '0';
+      if (challengeTicketSlider) challengeTicketSlider.value = '0';
       document.querySelectorAll('[data-challenge-game]').forEach(btn => btn.classList.remove('active-game'));
+      syncChallengeSliderUI(false);
+      renderChallengeSelectionState();
       hideChallengeRunStatus();
       resetChallengeBox();
-      renderChallengeSelectionState();
     }
 
     function renderGame() {
@@ -4141,7 +4144,7 @@ function clearSelections() {
         challengeGameChosen = true;
         renderChallengeSelectionState();
         updateResultsVisibility(currentFeature);
-        if (challengeControlsWrap) triggerGoldReveal(challengeControlsWrap);
+        triggerGoldReveal(challengeControlsWrap);
         syncChallengeSliderUI(true);
         setTimeout(() => {
           if (challengeControlsWrap) challengeControlsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -4149,11 +4152,11 @@ function clearSelections() {
       });
     });
 
-    if (ticketSlider) {
-      ticketSlider.addEventListener('input', () => {
+    if (challengeTicketSlider) {
+      challengeTicketSlider.addEventListener('input', () => {
         syncChallengeSliderUI(false);
       });
-      ticketSlider.addEventListener('change', () => {
+      challengeTicketSlider.addEventListener('change', () => {
         syncChallengeSliderUI(true);
       });
     }
@@ -4186,6 +4189,8 @@ function clearSelections() {
       if (feature === 'challenge') {
         challengeGameChosen = false;
         document.querySelectorAll('[data-challenge-game]').forEach(x => x.classList.remove('active-game'));
+        if (challengeTicketSlider) challengeTicketSlider.value = '0';
+        syncChallengeSliderUI(false);
         renderChallengeSelectionState();
       }
 
@@ -4375,7 +4380,6 @@ function clearSelections() {
         closePickerHelp();
       }
     });
-    });
 
     document.getElementById('runChallengeBtn').addEventListener('click', runChallenge);
     document.getElementById('clearChallengeBtn').addEventListener('click', clearChallengeSelections);
@@ -4419,9 +4423,9 @@ function clearSelections() {
       await initialiseGameData();
       setStartMode('launch');
       renderGame();
-      if (ticketSlider) ticketSlider.value = '0';
-      syncChallengeSliderUI(false);
       updateHomeFooterDate();
+      if (challengeTicketSlider) challengeTicketSlider.value = '0';
+      syncChallengeSliderUI(false);
       updateResultsVisibility('stats');
       if (workspaceShell) workspaceShell.classList.add('hidden');
       expandHomeEntry();
