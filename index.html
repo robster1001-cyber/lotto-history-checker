@@ -1976,14 +1976,30 @@
     }
 
 
-    .grid-reveal-glow {
-      animation: gridRevealGlow 0.9s ease;
+    .grid-reveal-hidden {
+      display: none !important;
     }
 
-    @keyframes gridRevealGlow {
-      0% { box-shadow: 0 0 0 rgba(96,165,250,0); border-color: rgba(255,255,255,0.08); }
-      35% { box-shadow: 0 0 0 3px rgba(96,165,250,0.16), 0 0 22px rgba(96,165,250,0.18); border-color: rgba(96,165,250,0.34); }
-      100% { box-shadow: 0 0 0 rgba(96,165,250,0); border-color: rgba(255,255,255,0.08); }
+    .gold-reveal-flash {
+      animation: goldRevealPulse 1s ease;
+    }
+
+    @keyframes goldRevealPulse {
+      0% {
+        box-shadow: 0 0 0 rgba(242,201,76,0);
+        border-color: rgba(255,255,255,0.08);
+      }
+      25% {
+        box-shadow:
+          0 0 0 2px rgba(242,201,76,0.22),
+          0 0 22px rgba(242,201,76,0.34),
+          0 0 42px rgba(242,201,76,0.16);
+        border-color: rgba(242,201,76,0.55);
+      }
+      100% {
+        box-shadow: 0 0 0 rgba(242,201,76,0);
+        border-color: rgba(255,255,255,0.08);
+      }
     }
 
 </style>
@@ -2062,18 +2078,18 @@
           <div class="button-group-shell">
             <div class="section-label">Lottery game</div>
             <div class="game-row">
-              <button class="active-game" data-game="lotto">UK Lotto</button>
+              <button data-game="lotto">UK Lotto</button>
               <button data-game="euromillions">EuroMillions</button>
               <button data-game="thunderball">Thunderball</button>
               <button data-game="setforlife">Set For Life</button>
             </div>
           </div>
-          <div class="selection-summary hidden" id="checkSelectionSummary">
+          <div class="selection-summary">
             <div class="tag" id="mainSummary">Your numbers: none selected</div>
             <div class="tag" id="bonusSummary">Bonus numbers: none selected</div>
           </div>
 
-          <div class="subsection hidden" id="checkMainSection">
+          <div class="subsection">
             <h4 id="mainTitle">Pick your numbers</h4>
             <div id="mainGrid" class="number-grid"></div>
             <div id="mainLineInputs" class="inline-inputs hidden"></div>
@@ -2085,12 +2101,12 @@
             <div id="bonusLineInputs" class="inline-inputs hidden"></div>
           </div>
 
-          <div class="btn-row check-actions hidden" id="checkActions">
+          <div class="btn-row check-actions">
             <button id="checkBtn">Check History</button>
             <button id="clearBtn">Clear</button>
           </div>
 
-          <div class="subsection hidden" id="checkDateSection">
+          <div class="subsection">
             <h4>Check numbers from</h4>
             <div class="toggle-row">
               <button id="startLaunchBtn" class="active-game" type="button">Lottery launch</button>
@@ -2447,10 +2463,6 @@ async function loadEuromillionsData() {
     const homeCardHelpTitle = document.getElementById('homeCardHelpTitle');
     const homeCardHelpBody = document.getElementById('homeCardHelpBody');
     const homeCardHelpClose = document.getElementById('homeCardHelpClose');
-    const checkSelectionSummary = document.getElementById('checkSelectionSummary');
-    const checkMainSection = document.getElementById('checkMainSection');
-    const checkActions = document.getElementById('checkActions');
-    const checkDateSection = document.getElementById('checkDateSection');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -2595,7 +2607,7 @@ function pickFromPool(pool, count) {
 
     function updateResultsVisibility(feature) {
       const rightPanel = document.querySelector('.panel.right');
-      const hideRightPanel = feature === 'stats' || feature === 'ticket';
+      const hideRightPanel = feature === 'stats' || feature === 'ticket' || (feature === 'check' && !checkGameChosen);
       if (rightPanel) rightPanel.classList.toggle('hidden', hideRightPanel);
 
       selectedGameBox.classList.toggle('hidden', feature !== 'check');
@@ -2610,6 +2622,50 @@ function pickFromPool(pool, count) {
 
       updateResultsBackTopVisibility();
     }
+
+
+    function triggerGoldReveal(element) {
+      if (!element) return;
+      element.classList.remove('gold-reveal-flash');
+      void element.offsetWidth;
+      element.classList.add('gold-reveal-flash');
+      setTimeout(() => element.classList.remove('gold-reveal-flash'), 1100);
+    }
+
+    function renderCheckGameSelectionState() {
+      const gameShell = document.querySelector('#checkSection .button-group-shell');
+      const summary = document.querySelector('#checkSection .selection-summary');
+      const mainSection = mainTitle ? mainTitle.closest('.subsection') : null;
+      const bonusSectionEl = document.getElementById('bonusSection');
+      const actions = document.querySelector('#checkSection .check-actions');
+      const startSection = document.querySelector('#checkSection .check-actions')?.nextElementSibling;
+
+      if (!gameShell) return;
+
+      if (!checkGameChosen) {
+        if (summary) summary.classList.add('hidden');
+        if (mainSection) mainSection.classList.add('hidden');
+        if (bonusSectionEl) bonusSectionEl.classList.add('hidden');
+        if (actions) actions.classList.add('hidden');
+        if (startSection) startSection.classList.add('hidden');
+        mainGrid.classList.add('grid-reveal-hidden');
+        bonusGrid.classList.add('grid-reveal-hidden');
+        selectedMain = [];
+        selectedBonus = [];
+      } else {
+        if (summary) summary.classList.remove('hidden');
+        if (mainSection) mainSection.classList.remove('hidden');
+        if (actions) actions.classList.remove('hidden');
+        if (startSection) startSection.classList.remove('hidden');
+        mainGrid.classList.remove('grid-reveal-hidden');
+
+        const current = games[currentGame];
+        const hasBonus = current && current.bonusCount > 0;
+        if (bonusSectionEl) bonusSectionEl.classList.toggle('hidden', !hasBonus);
+        bonusGrid.classList.toggle('grid-reveal-hidden', !hasBonus);
+      }
+    }
+
 
     function getCurrentGameDrawCountLabel() {
       const game = games[currentGame];
@@ -3769,25 +3825,6 @@ function clearSelections() {
       resetChallengeBox();
     }
 
-
-    function flashGrid(container) {
-      if (!container) return;
-      container.classList.remove('grid-reveal-glow');
-      void container.offsetWidth;
-      container.classList.add('grid-reveal-glow');
-      setTimeout(() => container.classList.remove('grid-reveal-glow'), 950);
-    }
-
-    function setCheckGameSelectionState(chosen) {
-      checkGameChosen = chosen;
-      if (checkSelectionSummary) checkSelectionSummary.classList.toggle('hidden', !chosen);
-      if (checkMainSection) checkMainSection.classList.toggle('hidden', !chosen);
-      if (checkActions) checkActions.classList.toggle('hidden', !chosen);
-      if (checkDateSection) checkDateSection.classList.toggle('hidden', !chosen);
-      const hasBonus = chosen && games[currentGame] && games[currentGame].bonusCount > 0;
-      document.getElementById('bonusSection').classList.toggle('hidden', !hasBonus);
-    }
-
     function renderGame() {
       const game = games[currentGame];
       const hasBonus = game.bonusCount > 0;
@@ -3809,12 +3846,9 @@ function clearSelections() {
       resetChallengeBox();
 
       if (currentFeature === 'check') {
-        setCheckGameSelectionState(checkGameChosen);
-        if (checkGameChosen) {
-          flashGrid(mainGrid);
-        }
+        renderCheckGameSelectionState();
       } else {
-        setCheckGameSelectionState(true);
+        document.getElementById('bonusSection').classList.toggle('hidden', !hasBonus);
       }
     }
 
@@ -3845,9 +3879,9 @@ function clearSelections() {
       clearChallengeSelections();
       setStartMode('launch');
       currentGame = 'lotto';
-      checkGameChosen = false;
       document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
-      document.querySelectorAll('[data-game="lotto"]').forEach(x => x.classList.add('active-game'));
+      document.querySelectorAll('#checkSection [data-game]').forEach(x => x.classList.remove('active-game'));
+      document.querySelectorAll('#pickerSection [data-game="lotto"]').forEach(x => x.classList.add('active-game'));
       renderGame();
       if (workspaceShell) workspaceShell.classList.add('hidden');
       expandHomeEntry();
@@ -3912,11 +3946,13 @@ function clearSelections() {
 
       panelTitle.textContent = labels[feature][0];
       panelSubtitle.textContent = labels[feature][1];
+
       if (feature === 'check') {
         checkGameChosen = false;
-        document.querySelectorAll('#checkSection [data-game]').forEach(btn => btn.classList.remove('active-game'));
-        setCheckGameSelectionState(false);
+        document.querySelectorAll('#checkSection [data-game]').forEach(x => x.classList.remove('active-game'));
+        renderCheckGameSelectionState();
       }
+
       updateResultsVisibility(feature);
       if (feature !== 'picker') closePickerHelp();
 
@@ -3947,7 +3983,7 @@ function clearSelections() {
         setTimeout(() => {
           const bonusSection = document.getElementById('bonusSection');
           if (bonusSection) bonusSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          flashGrid(bonusGrid);
+          triggerGoldReveal(bonusGrid);
         }, 80);
       }
     });
@@ -3966,15 +4002,38 @@ function clearSelections() {
 
     document.querySelectorAll('[data-game]').forEach(btn => {
       btn.addEventListener('click', () => {
-        const inCheckSection = !!btn.closest('#checkSection');
-        document.querySelectorAll('[data-game="' + btn.dataset.game + '"]').forEach(x => x.classList.add('active-game'));
-        document.querySelectorAll('[data-game]').forEach(x => {
-          if (x.dataset.game !== btn.dataset.game) x.classList.remove('active-game');
-        });
-        currentGame = btn.dataset.game;
-        if (inCheckSection) {
+        const inCheck = !!btn.closest('#checkSection');
+        const inPicker = !!btn.closest('#pickerSection');
+
+        if (inCheck) {
+          document.querySelectorAll('#checkSection [data-game]').forEach(x => x.classList.remove('active-game'));
+          btn.classList.add('active-game');
+          currentGame = btn.dataset.game;
           checkGameChosen = true;
+          closePickerHelp();
+          renderGame();
+          renderCheckGameSelectionState();
+          updateResultsVisibility(currentFeature);
+          triggerGoldReveal(mainGrid);
+          setTimeout(() => {
+            const mainSection = mainTitle?.closest('.subsection');
+            if (mainSection) mainSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 70);
+          return;
         }
+
+        if (inPicker) {
+          document.querySelectorAll('#pickerSection [data-game]').forEach(x => x.classList.remove('active-game'));
+          btn.classList.add('active-game');
+          currentGame = btn.dataset.game;
+          closePickerHelp();
+          renderGame();
+          return;
+        }
+
+        document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
+        btn.classList.add('active-game');
+        currentGame = btn.dataset.game;
         closePickerHelp();
         renderGame();
       });
