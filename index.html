@@ -2041,7 +2041,7 @@
       display: none !important;
     }
 
-    .slider-shell {
+    .challenge-slider-shell {
       padding: 14px 16px 16px;
       border-radius: 18px;
       background: rgba(255,255,255,0.04);
@@ -2049,16 +2049,16 @@
       margin-bottom: 14px;
     }
 
-    .slider-value-wrap {
+    .challenge-slider-value-wrap {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
       gap: 12px;
-      margin-bottom: 10px;
       flex-wrap: wrap;
+      margin-bottom: 10px;
     }
 
-    .slider-value {
+    .challenge-slider-value {
       font-size: clamp(1.8rem, 4vw, 2.5rem);
       font-weight: 800;
       line-height: 1;
@@ -2066,13 +2066,13 @@
       text-shadow: 0 0 16px rgba(242,201,76,0.12);
     }
 
-    .slider-note {
+    .challenge-slider-note {
       color: var(--muted);
       font-size: 0.9rem;
       font-weight: 700;
     }
 
-    .ticket-slider {
+    .challenge-ticket-slider {
       width: 100%;
       appearance: none;
       -webkit-appearance: none;
@@ -2084,7 +2084,7 @@
       margin: 10px 0 14px;
     }
 
-    .ticket-slider::-webkit-slider-thumb {
+    .challenge-ticket-slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
       width: 22px;
@@ -2099,7 +2099,7 @@
       cursor: pointer;
     }
 
-    .ticket-slider::-moz-range-thumb {
+    .challenge-ticket-slider::-moz-range-thumb {
       width: 22px;
       height: 22px;
       border-radius: 50%;
@@ -2112,7 +2112,7 @@
       cursor: pointer;
     }
 
-    .slider-stops {
+    .challenge-slider-stops {
       display: grid;
       grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: 8px;
@@ -2123,7 +2123,7 @@
       letter-spacing: 0.04em;
     }
 
-    .slider-stops span {
+    .challenge-slider-stops span {
       text-align: center;
     }
 
@@ -2139,29 +2139,21 @@
     }
 
     @keyframes challengeSliderPulse {
-      0% {
-        text-shadow: 0 0 0 rgba(242,201,76,0);
-      }
-      25% {
-        text-shadow:
-          0 0 10px rgba(242,201,76,0.42),
-          0 0 26px rgba(242,201,76,0.18);
-      }
-      100% {
-        text-shadow: 0 0 0 rgba(242,201,76,0);
-      }
+      0% { text-shadow: 0 0 0 rgba(242,201,76,0); }
+      25% { text-shadow: 0 0 10px rgba(242,201,76,0.42), 0 0 26px rgba(242,201,76,0.18); }
+      100% { text-shadow: 0 0 0 rgba(242,201,76,0); }
     }
 
     @media (max-width: 620px) {
-      .slider-shell {
+      .challenge-slider-shell {
         padding: 12px 12px 14px;
       }
 
-      .slider-value {
+      .challenge-slider-value {
         font-size: 1.9rem;
       }
 
-      .slider-stops {
+      .challenge-slider-stops {
         font-size: 0.72rem;
         gap: 4px;
       }
@@ -2300,23 +2292,14 @@
           </div>
 
           <div id="challengeControlsWrap" class="challenge-reveal-hidden">
-            <div class="slider-shell">
+            <div class="challenge-slider-shell">
               <div class="section-label">Number of random tickets</div>
-              <div class="slider-value-wrap">
-                <div class="slider-value" id="challengeTicketValue">10 tickets</div>
-                <div class="slider-note" id="challengeTicketMood">Feeling cautious 😇</div>
+              <div class="challenge-slider-value-wrap">
+                <div class="challenge-slider-value" id="challengeTicketValue">10 tickets</div>
+                <div class="challenge-slider-note" id="challengeTicketMood">Feeling cautious 😇</div>
               </div>
-              <input
-                id="ticketSlider"
-                class="ticket-slider"
-                type="range"
-                min="0"
-                max="5"
-                step="1"
-                value="0"
-                aria-label="Number of random tickets"
-              />
-              <div class="slider-stops">
+              <input id="ticketSlider" class="challenge-ticket-slider" type="range" min="0" max="5" step="1" value="0" aria-label="Number of random tickets" />
+              <div class="challenge-slider-stops">
                 <span>10</span>
                 <span>50</span>
                 <span>100</span>
@@ -2324,7 +2307,7 @@
                 <span>5K</span>
                 <span>10K</span>
               </div>
-              <div class="challenge-game-meta" id="challengeGameMeta">Pick a game to see the ticket price and run the pain properly.</div>
+              <div class="challenge-game-meta" id="challengeGameMeta">Pick a game to unlock the pain.</div>
             </div>
 
             <div class="btn-row">
@@ -2339,7 +2322,7 @@
         </div>
 
         <div id="pickerSection" class="hidden">
- class="hidden">
+
 
           <div class="button-group-shell">
             <div class="section-label">Lottery game</div>
@@ -2777,20 +2760,14 @@ function pickFromPool(pool, count) {
       if (challengeGameMeta && challengeGameChosen) {
         const game = games[currentGame];
         const price = typeof game.ticketPrice === 'number' ? `£${game.ticketPrice.toFixed(game.ticketPrice % 1 ? 2 : 0)}` : '—';
-        challengeGameMeta.textContent = `${game.label} • ${price} per ticket • From lottery launch`;
+        challengeGameMeta.textContent = `${game.label} • ${price} per ticket • From ${game.label} launch`;
       }
     }
 
     function renderChallengeSelectionState() {
       if (!challengeControlsWrap) return;
-
-      if (!challengeGameChosen) {
-        challengeControlsWrap.classList.add('challenge-reveal-hidden');
-        return;
-      }
-
-      challengeControlsWrap.classList.remove('challenge-reveal-hidden');
-      syncChallengeSliderUI(false);
+      challengeControlsWrap.classList.toggle('challenge-reveal-hidden', !challengeGameChosen);
+      if (challengeGameChosen) syncChallengeSliderUI(false);
     }
 
     function setHistoryResultsDimmed(dimmed = true) {
@@ -4164,7 +4141,7 @@ function clearSelections() {
         challengeGameChosen = true;
         renderChallengeSelectionState();
         updateResultsVisibility(currentFeature);
-        triggerGoldReveal(challengeControlsWrap);
+        if (challengeControlsWrap) triggerGoldReveal(challengeControlsWrap);
         syncChallengeSliderUI(true);
         setTimeout(() => {
           if (challengeControlsWrap) challengeControlsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -4177,8 +4154,6 @@ function clearSelections() {
         syncChallengeSliderUI(false);
       });
       ticketSlider.addEventListener('change', () => {
-        const nearest = Number(ticketSlider.value) || 0;
-        ticketSlider.value = String(nearest);
         syncChallengeSliderUI(true);
       });
     }
@@ -4444,9 +4419,9 @@ function clearSelections() {
       await initialiseGameData();
       setStartMode('launch');
       renderGame();
-      updateHomeFooterDate();
       if (ticketSlider) ticketSlider.value = '0';
       syncChallengeSliderUI(false);
+      updateHomeFooterDate();
       updateResultsVisibility('stats');
       if (workspaceShell) workspaceShell.classList.add('hidden');
       expandHomeEntry();
