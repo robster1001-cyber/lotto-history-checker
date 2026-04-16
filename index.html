@@ -2240,6 +2240,8 @@
   <script>
 window.LOTTO_DATA = [];
 window.LOTTO_DATA_READY = false;
+window.EUROMILLIONS_DATA = [];
+window.EUROMILLIONS_DATA_READY = false;
 
 async function loadLottoData() {
   if (window.LOTTO_DATA_READY) return window.LOTTO_DATA;
@@ -2250,12 +2252,18 @@ async function loadLottoData() {
   return window.LOTTO_DATA;
 }
 
+async function loadEuromillionsData() {
+  if (window.EUROMILLIONS_DATA_READY) return window.EUROMILLIONS_DATA;
+  const response = await fetch('./euromillions.json', { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Failed to load EuroMillions data: ${response.status}`);
+  window.EUROMILLIONS_DATA = await response.json();
+  window.EUROMILLIONS_DATA_READY = true;
+  return window.EUROMILLIONS_DATA;
+}
+
     const sampleLotto = window.LOTTO_DATA || [];
 
-    const sampleEuro = window.EUROMILLIONS_DATA || [
-      { date: '2019-06-14', main: [5, 12, 19, 28, 44], bonus: [3, 8] },
-      { date: '2021-09-03', main: [7, 14, 22, 31, 45], bonus: [1, 11] }
-    ];
+    const sampleEuro = window.EUROMILLIONS_DATA || [];
 
     const sampleThunder = window.THUNDERBALL_DATA || [
       { date: '2020-02-12', main: [4, 9, 17, 22, 31], bonus: [11] },
@@ -2340,8 +2348,8 @@ async function loadLottoData() {
       return matches;
     }
 
-    async function initialiseLottoData() {
-      const loadingMessage = '<div class="kicker">Loading</div><h3>Loading Lotto data...</h3>';
+    async function initialiseGameData() {
+      const loadingMessage = '<div class="kicker">Loading</div><h3>Loading draw data...</h3>';
       if (historyResultsBox.innerHTML.trim() === '') {
         historyResultsBox.style.display = 'block';
         historyResultsBox.innerHTML = loadingMessage;
@@ -2360,8 +2368,12 @@ async function loadLottoData() {
       document.getElementById('pickerTestBtn').disabled = true;
 
       try {
-        const lottoData = await loadLottoData();
+        const [lottoData, euromillionsData] = await Promise.all([
+          loadLottoData(),
+          loadEuromillionsData()
+        ]);
         games.lotto.draws = lottoData;
+        games.euromillions.draws = euromillionsData;
         buildDrawEngine();
         updateHomeFooterDate();
       } finally {
@@ -4040,7 +4052,7 @@ function clearSelections() {
     window.addEventListener('resize', updateTopResetVisibility);
 
     (async function bootApp() {
-      await initialiseLottoData();
+      await initialiseGameData();
       setStartMode('launch');
       renderGame();
       updateHomeFooterDate();
