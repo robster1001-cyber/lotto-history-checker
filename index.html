@@ -3891,25 +3891,32 @@ function runPickerCheck() {
   let bestTicketDate = null;
   let bestTicketNumbers = null;
   let bestTicketMatchedNumbers = null;
+  let bestTicketBonusNumbers = null;
+  let bestTicketMatchedBonusNumbers = null;
 
   const challengeBuckets = {};
   for (let i = 0; i <= game.mainCount; i++) challengeBuckets[i] = 0;
 
   for (let t = 0; t < challengeTickets; t++) {
     const ticket = randomUnique(game.mainMax, game.mainCount);
+    const ticketBonus = game.bonusCount > 0 ? randomUnique(game.bonusMax, game.bonusCount) : [];
     let ticketBest = 0;
     let ticketBestDate = null;
     let ticketBestMatchedNumbers = [];
+    let ticketBestMatchedBonusNumbers = [];
 
     for (let i = 0, len = drawSets.length; i < len; i++) {
       const drawMain = game.draws[i]?.main || [];
       const matchedNumbers = ticket.filter(n => drawMain.includes(n));
+      const drawBonus = game.draws[i]?.bonus || [];
+      const matchedBonusNumbers = ticketBonus.filter(n => drawBonus.includes(n));
       const m = matchedNumbers.length;
 
       if (m > ticketBest) {
         ticketBest = m;
         ticketBestDate = draws[i]?.date || null;
         ticketBestMatchedNumbers = [...matchedNumbers];
+        ticketBestMatchedBonusNumbers = [...matchedBonusNumbers];
       }
 
       if (m > 0) challengeBuckets[m] = (challengeBuckets[m] || 0) + 1;
@@ -3920,8 +3927,10 @@ function runPickerCheck() {
     if (ticketBest > bestMatch) {
       bestMatch = ticketBest;
       bestTicketNumbers = [...ticket];
+      bestTicketBonusNumbers = [...ticketBonus];
       bestTicketDate = ticketBestDate;
       bestTicketMatchedNumbers = [...ticketBestMatchedNumbers];
+      bestTicketMatchedBonusNumbers = [...ticketBestMatchedBonusNumbers];
     }
   }
 
@@ -3931,6 +3940,11 @@ function runPickerCheck() {
   const bestTicketHtml = bestTicketNumbers
     ? `<div class="compact-ball-row">${bestTicketNumbers.map(n => `<span class="picked-ball main compact-ball ${bestTicketMatchedNumbers && bestTicketMatchedNumbers.includes(n) ? 'match' : ''}">${n}</span>`).join('')}</div>`
     : '<div class="picked-line empty">—</div>';
+  const bestTicketBonusHtml = game.bonusCount > 0
+    ? (bestTicketBonusNumbers && bestTicketBonusNumbers.length
+        ? `<div class="compact-ball-row">${bestTicketBonusNumbers.map(n => `<span class="picked-ball bonus compact-ball ${bestTicketMatchedBonusNumbers && bestTicketMatchedBonusNumbers.includes(n) ? 'match' : ''}">${n}</span>`).join('')}</div>`
+        : '<div class="picked-line empty">—</div>')
+    : '';
 
   challengeResultsBox.innerHTML = `
     <div class="kicker">Bulk Buy result</div>
@@ -3992,7 +4006,8 @@ function runPickerCheck() {
         <div class="stats-list">
           <div class="stats-row"><span>Best result</span><strong>${bestMatch ? `${bestMatch} match${bestMatch > 1 ? 'es' : ''}` : 'N/A'}</strong></div>
           <div class="stats-row"><span>Times it happened</span><strong>${bestMatchCount.toLocaleString()}</strong></div>
-          <div class="stats-row"><span>Winning example</span><div>${bestTicketHtml}</div></div>
+          <div class="stats-row"><span>Main ticket</span><div>${bestTicketHtml}</div></div>
+          ${game.bonusCount > 0 ? `<div class="stats-row"><span>${game.bonusLabel}</span><div>${bestTicketBonusHtml}</div></div>` : ''}
           <div class="stats-row"><span>Ticket date</span><strong>${bestTicketDate ? formatDate(bestTicketDate) : 'N/A'}</strong></div>
         </div>
       </details>
@@ -4142,6 +4157,8 @@ function clearSelections() {
         btn.classList.add('active-game');
         currentGame = btn.dataset.challengeGame;
         challengeGameChosen = true;
+        resetChallengeBox();
+        hideChallengeRunStatus();
         renderChallengeSelectionState();
         updateResultsVisibility(currentFeature);
         triggerGoldReveal(challengeControlsWrap);
