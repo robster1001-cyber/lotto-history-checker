@@ -3939,7 +3939,7 @@ function runPickerCheck() {
     : '<div class="picked-line empty">—</div>';
   const bestTicketBonusHtml = game.bonusCount > 0
     ? (bestTicketBonusNumbers && bestTicketBonusNumbers.length
-        ? `<div class="compact-ball-row">${bestTicketBonusNumbers.map(n => `<span class="picked-ball bonus compact-ball ${bestTicketMatchedBonusNumbers && bestTicketMatchedBonusNumbers.includes(n) ? 'match' : ''}">${n}</span>`).join('')}</div>`
+        ? `<div class="compact-ball-row">${bestTicketBonusNumbers.map(n => `<span class="picked-ball main compact-ball ${bestTicketMatchedBonusNumbers && bestTicketMatchedBonusNumbers.includes(n) ? 'match' : ''}">${n}</span>`).join('')}</div>`
         : '<div class="picked-line empty">—</div>')
     : '';
 
@@ -3952,11 +3952,7 @@ function runPickerCheck() {
     <div class="result-headline">
       <div class="hero-stat ${profitLoss >= 0 ? 'positive' : 'negative'}">
         <div class="label">Profit / loss</div>
-        <div class="value">${formatMoney(profitLoss)}</div>
-        <div style="margin-top:6px;font-size:0.85rem;color:var(--muted);font-weight:600;">
-          Try again… go on, make it green 😏
-        </div>
-      </div>
+        <div class="value">${formatMoney(profitLoss)}</div>      </div>
 
       <div class="mini-stat-grid">
         <div class="mini-stat">
