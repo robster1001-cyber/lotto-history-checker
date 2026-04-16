@@ -2036,6 +2036,137 @@
       }
     }
 
+
+    .challenge-reveal-hidden {
+      display: none !important;
+    }
+
+    .slider-shell {
+      padding: 14px 16px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.06);
+      margin-bottom: 14px;
+    }
+
+    .slider-value-wrap {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .slider-value {
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      line-height: 1;
+      color: #f8fafc;
+      text-shadow: 0 0 16px rgba(242,201,76,0.12);
+    }
+
+    .slider-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .ticket-slider {
+      width: 100%;
+      appearance: none;
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(242,201,76,0.34) 0%, rgba(96,165,250,0.18) 100%);
+      outline: none;
+      border: 1px solid rgba(255,255,255,0.08);
+      margin: 10px 0 14px;
+    }
+
+    .ticket-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fde68a 0%, #f2c94c 100%);
+      border: none;
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.08),
+        0 0 14px rgba(242,201,76,0.45),
+        0 0 28px rgba(242,201,76,0.18);
+      cursor: pointer;
+    }
+
+    .ticket-slider::-moz-range-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #fde68a 0%, #f2c94c 100%);
+      border: none;
+      box-shadow:
+        0 0 0 2px rgba(255,255,255,0.08),
+        0 0 14px rgba(242,201,76,0.45),
+        0 0 28px rgba(242,201,76,0.18);
+      cursor: pointer;
+    }
+
+    .slider-stops {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .slider-stops span {
+      text-align: center;
+    }
+
+    .challenge-game-meta {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+
+    .challenge-slider-pulse {
+      animation: challengeSliderPulse 1.3s ease-out;
+    }
+
+    @keyframes challengeSliderPulse {
+      0% {
+        text-shadow: 0 0 0 rgba(242,201,76,0);
+      }
+      25% {
+        text-shadow:
+          0 0 10px rgba(242,201,76,0.42),
+          0 0 26px rgba(242,201,76,0.18);
+      }
+      100% {
+        text-shadow: 0 0 0 rgba(242,201,76,0);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .slider-shell {
+        padding: 12px 12px 14px;
+      }
+
+      .slider-value {
+        font-size: 1.9rem;
+      }
+
+      .slider-stops {
+        font-size: 0.72rem;
+        gap: 4px;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -2156,31 +2287,59 @@
           </div>
         </div>
 
+        
         <div id="challengeSection" class="hidden">
-          <div class="subsection">
-            <h4>Number of random tickets</h4>
-            <div class="btn-row" id="ticketAmountRow">
-              <button data-tickets="10" class="active-game">10</button>
-              <button data-tickets="50">50</button>
-              <button data-tickets="100">100</button>
-              <button data-tickets="500">500</button>
-              <button data-tickets="1000">1000</button>
-              <button data-tickets="5000">5000</button>
-              <button data-tickets="10000">10000</button>
+          <div class="button-group-shell">
+            <div class="section-label">Lottery game</div>
+            <div class="game-row" id="challengeGameRow">
+              <button data-challenge-game="lotto">UK Lotto</button>
+              <button data-challenge-game="euromillions">EuroMillions</button>
+              <button data-challenge-game="thunderball">Thunderball</button>
+              <button data-challenge-game="setforlife">Set For Life</button>
             </div>
           </div>
 
-          <div class="btn-row">
-            <button class="primary" id="runChallengeBtn">Play Now</button>
-            <button id="clearChallengeBtn">Clear</button>
-          </div>
+          <div id="challengeControlsWrap" class="challenge-reveal-hidden">
+            <div class="slider-shell">
+              <div class="section-label">Number of random tickets</div>
+              <div class="slider-value-wrap">
+                <div class="slider-value" id="challengeTicketValue">10 tickets</div>
+                <div class="slider-note" id="challengeTicketMood">Feeling cautious 😇</div>
+              </div>
+              <input
+                id="ticketSlider"
+                class="ticket-slider"
+                type="range"
+                min="0"
+                max="5"
+                step="1"
+                value="0"
+                aria-label="Number of random tickets"
+              />
+              <div class="slider-stops">
+                <span>10</span>
+                <span>50</span>
+                <span>100</span>
+                <span>1K</span>
+                <span>5K</span>
+                <span>10K</span>
+              </div>
+              <div class="challenge-game-meta" id="challengeGameMeta">Pick a game to see the ticket price and run the pain properly.</div>
+            </div>
 
-          <div class="run-status hidden" id="challengeRunStatus">
-            <span class="dot-wave">Running 10,000 tickets… this might sting</span>
+            <div class="btn-row">
+              <button class="primary" id="runChallengeBtn">Play Now</button>
+              <button id="clearChallengeBtn">Clear</button>
+            </div>
+
+            <div class="run-status hidden" id="challengeRunStatus">
+              <span class="dot-wave">Running 10,000 tickets… this might sting</span>
+            </div>
           </div>
         </div>
 
         <div id="pickerSection" class="hidden">
+ class="hidden">
 
           <div class="button-group-shell">
             <div class="section-label">Lottery game</div>
@@ -2464,6 +2623,7 @@ async function loadEuromillionsData() {
     let challengeTickets = 10;
     let challengeRunStatusTimer = null;
     let checkGameChosen = false;
+    let challengeGameChosen = false;
 
     const mainGrid = document.getElementById('mainGrid');
     const bonusGrid = document.getElementById('bonusGrid');
@@ -2497,6 +2657,11 @@ async function loadEuromillionsData() {
     const homeCardHelpTitle = document.getElementById('homeCardHelpTitle');
     const homeCardHelpBody = document.getElementById('homeCardHelpBody');
     const homeCardHelpClose = document.getElementById('homeCardHelpClose');
+    const challengeControlsWrap = document.getElementById('challengeControlsWrap');
+    const challengeGameMeta = document.getElementById('challengeGameMeta');
+    const challengeTicketValue = document.getElementById('challengeTicketValue');
+    const challengeTicketMood = document.getElementById('challengeTicketMood');
+    const ticketSlider = document.getElementById('ticketSlider');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -2529,6 +2694,8 @@ async function loadEuromillionsData() {
       stats: document.getElementById('statsSection'),
       ticket: document.getElementById('ticketSection')
     };
+
+    const challengeTicketStops = [10, 50, 100, 1000, 5000, 10000];
 
     function sortNums(arr) {
       return [...arr].sort((a, b) => a - b);
@@ -2578,6 +2745,53 @@ function pickFromPool(pool, count) {
     }
 
 
+
+
+    function formatTicketCount(value) {
+      return value >= 1000 ? `${value.toLocaleString()} tickets` : `${value} tickets`;
+    }
+
+    function getChallengeMood(value) {
+      if (value <= 10) return 'Feeling cautious 😇';
+      if (value <= 50) return 'Getting brave...';
+      if (value <= 100) return 'This could get expensive';
+      if (value <= 1000) return 'Now we’re talking';
+      if (value <= 5000) return 'Bold behaviour';
+      return 'You absolute maniac 😂';
+    }
+
+    function syncChallengeSliderUI(pulse = false) {
+      if (!ticketSlider || !challengeTicketValue || !challengeTicketMood) return;
+      const sliderIndex = Number(ticketSlider.value) || 0;
+      challengeTickets = challengeTicketStops[sliderIndex] || 10;
+      challengeTicketValue.textContent = formatTicketCount(challengeTickets);
+      challengeTicketMood.textContent = getChallengeMood(challengeTickets);
+
+      if (pulse) {
+        challengeTicketValue.classList.remove('challenge-slider-pulse');
+        void challengeTicketValue.offsetWidth;
+        challengeTicketValue.classList.add('challenge-slider-pulse');
+        setTimeout(() => challengeTicketValue.classList.remove('challenge-slider-pulse'), 1350);
+      }
+
+      if (challengeGameMeta && challengeGameChosen) {
+        const game = games[currentGame];
+        const price = typeof game.ticketPrice === 'number' ? `£${game.ticketPrice.toFixed(game.ticketPrice % 1 ? 2 : 0)}` : '—';
+        challengeGameMeta.textContent = `${game.label} • ${price} per ticket • From lottery launch`;
+      }
+    }
+
+    function renderChallengeSelectionState() {
+      if (!challengeControlsWrap) return;
+
+      if (!challengeGameChosen) {
+        challengeControlsWrap.classList.add('challenge-reveal-hidden');
+        return;
+      }
+
+      challengeControlsWrap.classList.remove('challenge-reveal-hidden');
+      syncChallengeSliderUI(false);
+    }
 
     function setHistoryResultsDimmed(dimmed = true) {
       historyResultsBox.classList.toggle('results-dimmed', dimmed);
@@ -2641,7 +2855,7 @@ function pickFromPool(pool, count) {
 
     function updateResultsVisibility(feature) {
       const rightPanel = document.querySelector('.panel.right');
-      const hideRightPanel = feature === 'stats' || feature === 'ticket' || (feature === 'check' && !checkGameChosen);
+      const hideRightPanel = feature === 'stats' || feature === 'ticket' || (feature === 'check' && !checkGameChosen) || (feature === 'challenge' && !challengeGameChosen);
       if (rightPanel) rightPanel.classList.toggle('hidden', hideRightPanel);
 
       selectedGameBox.classList.toggle('hidden', feature !== 'check');
@@ -3742,8 +3956,8 @@ function runPickerCheck() {
   challengeResultsBox.innerHTML = `
     <div class="kicker">Bulk Buy result</div>
     <h3 style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
-      <span>${challengeTickets.toLocaleString()} tickets tested</span>
-      <span style="font-size:0.86rem;font-weight:800;color:var(--muted);padding-top:4px;">From lottery launch</span>
+      <span>${challengeTickets.toLocaleString()} ${game.label} tickets tested</span>
+      <span style="font-size:0.86rem;font-weight:800;color:var(--muted);padding-top:4px;">From ${game.label} launch • £${ticketPrice.toFixed(ticketPrice % 1 ? 2 : 0)} per ticket</span>
     </h3>
     <div class="result-headline">
       <div class="hero-stat ${profitLoss >= 0 ? 'positive' : 'negative'}">
@@ -3829,34 +4043,13 @@ function clearSelections() {
 
     function clearChallengeSelections() {
       challengeTickets = 10;
-  
-    document.querySelectorAll('.mode-help').forEach(helpBtn => {
-      helpBtn.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        togglePickerHelp(helpBtn.dataset.style, helpBtn.dataset.title, helpBtn.dataset.tip);
-      });
-
-      helpBtn.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault();
-          event.stopPropagation();
-          togglePickerHelp(helpBtn.dataset.style, helpBtn.dataset.title, helpBtn.dataset.tip);
-        }
-      });
-    });
-
-    document.addEventListener('click', (event) => {
-      if (!event.target.closest('.mode-help') && !event.target.closest('#pickerHelpPanel')) {
-        closePickerHelp();
-      }
-    });
-
-    document.querySelectorAll('#ticketAmountRow button').forEach(btn => {
-        btn.classList.toggle('active-game', btn.dataset.tickets === '10');
-      });
+      challengeGameChosen = false;
+      currentGame = 'lotto';
+      if (ticketSlider) ticketSlider.value = '0';
+      document.querySelectorAll('[data-challenge-game]').forEach(btn => btn.classList.remove('active-game'));
       hideChallengeRunStatus();
       resetChallengeBox();
+      renderChallengeSelectionState();
     }
 
     function renderGame() {
@@ -3962,7 +4155,35 @@ function clearSelections() {
       collapseHomeEntry();
       closeHomeCardHelp();
 
-      document.querySelectorAll('.feature-card').forEach(card => {
+  
+    document.querySelectorAll('[data-challenge-game]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-challenge-game]').forEach(x => x.classList.remove('active-game'));
+        btn.classList.add('active-game');
+        currentGame = btn.dataset.challengeGame;
+        challengeGameChosen = true;
+        renderChallengeSelectionState();
+        updateResultsVisibility(currentFeature);
+        triggerGoldReveal(challengeControlsWrap);
+        syncChallengeSliderUI(true);
+        setTimeout(() => {
+          if (challengeControlsWrap) challengeControlsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 70);
+      });
+    });
+
+    if (ticketSlider) {
+      ticketSlider.addEventListener('input', () => {
+        syncChallengeSliderUI(false);
+      });
+      ticketSlider.addEventListener('change', () => {
+        const nearest = Number(ticketSlider.value) || 0;
+        ticketSlider.value = String(nearest);
+        syncChallengeSliderUI(true);
+      });
+    }
+
+    document.querySelectorAll('.feature-card').forEach(card => {
         card.classList.toggle('active', card.dataset.feature === feature);
       });
 
@@ -3985,6 +4206,12 @@ function clearSelections() {
         checkGameChosen = false;
         document.querySelectorAll('#checkSection [data-game]').forEach(x => x.classList.remove('active-game'));
         renderCheckGameSelectionState();
+      }
+
+      if (feature === 'challenge') {
+        challengeGameChosen = false;
+        document.querySelectorAll('[data-challenge-game]').forEach(x => x.classList.remove('active-game'));
+        renderChallengeSelectionState();
       }
 
       updateResultsVisibility(feature);
@@ -4173,13 +4400,6 @@ function clearSelections() {
         closePickerHelp();
       }
     });
-
-    document.querySelectorAll('#ticketAmountRow button').forEach(btn => {
-      btn.addEventListener('click', () => {
-        challengeTickets = parseInt(btn.dataset.tickets, 10);
-        document.querySelectorAll('#ticketAmountRow button').forEach(b => b.classList.remove('active-game'));
-        btn.classList.add('active-game');
-      });
     });
 
     document.getElementById('runChallengeBtn').addEventListener('click', runChallenge);
@@ -4225,6 +4445,8 @@ function clearSelections() {
       setStartMode('launch');
       renderGame();
       updateHomeFooterDate();
+      if (ticketSlider) ticketSlider.value = '0';
+      syncChallengeSliderUI(false);
       updateResultsVisibility('stats');
       if (workspaceShell) workspaceShell.classList.add('hidden');
       expandHomeEntry();
