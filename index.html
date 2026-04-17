@@ -1734,12 +1734,12 @@
     }
 
     .picker-personality-sticky {
-      position: sticky;
-      top: 10px;
-      z-index: 22;
+      position: static;
+      top: auto;
+      z-index: auto;
       padding: 12px 0 8px;
-      background: linear-gradient(180deg, rgba(30,41,59,0.98) 0%, rgba(30,41,59,0.92) 75%, rgba(30,41,59,0) 100%);
-      backdrop-filter: blur(4px);
+      background: none;
+      backdrop-filter: none;
     }
 
     .picker-post-style.hidden {
@@ -1756,7 +1756,7 @@
       }
 
       .picker-personality-sticky {
-        top: 6px;
+        top: auto;
       }
     }
 
@@ -2040,6 +2040,11 @@
     .challenge-reveal-hidden {
       display: none !important;
     }
+
+    .ticket-history-hidden {
+      display: none !important;
+    }
+
 
     .challenge-slider-shell {
       padding: 14px 16px 16px;
@@ -2414,9 +2419,26 @@
         <div id="ticketSection" class="hidden">
           <div class="info-box">
             <div class="kicker">Draw history</div>
-            <h3>Winning numbers by year</h3>
-</div>
-          <div class="draw-history-wrap" id="drawHistoryBox"></div>
+            <h3>Choose a game, then browse the winning numbers by year</h3>
+          </div>
+
+          <div class="button-group-shell">
+            <div class="section-label">Lottery game</div>
+            <div class="game-row" id="ticketGameRow">
+              <button type="button" data-ticket-game="lotto">UK Lotto</button>
+              <button type="button" data-ticket-game="euromillions">EuroMillions</button>
+              <button type="button" data-ticket-game="thunderball">Thunderball</button>
+              <button type="button" data-ticket-game="setforlife">Set For Life</button>
+            </div>
+          </div>
+
+          <div class="info-box ticket-history-hidden" id="ticketHistoryIntroBox">
+            <div class="kicker">Winning numbers</div>
+            <h3 id="ticketHistoryTitle">UK Lotto draw history</h3>
+            <p class="muted" id="ticketHistorySubtitle">Browse the real draws year by year.</p>
+          </div>
+
+          <div class="draw-history-wrap ticket-history-hidden" id="drawHistoryBox"></div>
           <button class="ticket-top-btn" id="ticketTopBtn" type="button">↑ Top</button>
         </div>
       </div>
@@ -2673,6 +2695,7 @@ async function loadEuromillionsData() {
     let challengeRunStatusTimer = null;
     let checkGameChosen = false;
     let challengeGameChosen = false;
+    let ticketGameChosen = false;
 
     const mainGrid = document.getElementById('mainGrid');
     const bonusGrid = document.getElementById('bonusGrid');
@@ -2711,6 +2734,9 @@ async function loadEuromillionsData() {
     const challengeTicketMood = document.getElementById('challengeTicketMood');
     const challengeTicketSlider = document.getElementById('challengeTicketSlider');
     const challengeGameMeta = document.getElementById('challengeGameMeta');
+    const ticketHistoryIntroBox = document.getElementById('ticketHistoryIntroBox');
+    const ticketHistoryTitle = document.getElementById('ticketHistoryTitle');
+    const ticketHistorySubtitle = document.getElementById('ticketHistorySubtitle');
 
     const verdictPhrases = {
       smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
@@ -2924,6 +2950,22 @@ function pickFromPool(pool, count) {
       void element.offsetWidth;
       element.classList.add('gold-reveal-flash');
       setTimeout(() => element.classList.remove('gold-reveal-flash'), 2100);
+    }
+
+
+    function renderTicketSelectionState() {
+      const drawWrap = document.getElementById('drawHistoryBox');
+      const showHistory = ticketGameChosen;
+
+      if (ticketHistoryIntroBox) ticketHistoryIntroBox.classList.toggle('ticket-history-hidden', !showHistory);
+      if (drawWrap) drawWrap.classList.toggle('ticket-history-hidden', !showHistory);
+      if (ticketTopBtn) ticketTopBtn.classList.toggle('hidden', !showHistory);
+
+      if (showHistory) {
+        const game = games[currentGame];
+        if (ticketHistoryTitle) ticketHistoryTitle.textContent = `${game.label} draw history`;
+        if (ticketHistorySubtitle) ticketHistorySubtitle.textContent = `Browse ${game.label} winning numbers year by year.`;
+      }
     }
 
     function renderCheckGameSelectionState() {
@@ -4126,6 +4168,7 @@ function clearSelections() {
       resetHistoryBox();
       resetPickerBox();
       resetChallengeBox();
+      renderTicketSelectionState();
 
       if (currentFeature === 'check') {
         renderCheckGameSelectionState();
@@ -4159,6 +4202,7 @@ function clearSelections() {
     function fullyResetToHome() {
       clearSelections();
       clearChallengeSelections();
+      ticketGameChosen = false;
       setStartMode('launch');
       currentGame = 'lotto';
       document.querySelectorAll('[data-game]').forEach(x => x.classList.remove('active-game'));
@@ -4238,6 +4282,22 @@ function clearSelections() {
       });
     }
 
+
+    document.querySelectorAll('[data-ticket-game]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('[data-ticket-game]').forEach(x => x.classList.remove('active-game'));
+        btn.classList.add('active-game');
+        currentGame = btn.dataset.ticketGame;
+        ticketGameChosen = true;
+        closePickerHelp();
+        renderGame();
+        renderTicketSelectionState();
+        setTimeout(() => {
+          if (ticketHistoryIntroBox) ticketHistoryIntroBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 70);
+      });
+    });
+
     document.querySelectorAll('.feature-card').forEach(card => {
         card.classList.toggle('active', card.dataset.feature === feature);
       });
@@ -4269,6 +4329,12 @@ function clearSelections() {
         if (challengeTicketSlider) challengeTicketSlider.value = '0';
         syncChallengeSliderUI(false);
         renderChallengeSelectionState();
+      }
+
+      if (feature === 'ticket') {
+        ticketGameChosen = false;
+        document.querySelectorAll('[data-ticket-game]').forEach(x => x.classList.remove('active-game'));
+        renderTicketSelectionState();
       }
 
       updateResultsVisibility(feature);
@@ -4507,6 +4573,7 @@ function clearSelections() {
       if (workspaceShell) workspaceShell.classList.add('hidden');
       expandHomeEntry();
       document.querySelectorAll('.feature-card').forEach(card => card.classList.remove('active'));
+      renderTicketSelectionState();
       updateTopResetVisibility();
     })();
 </script>
