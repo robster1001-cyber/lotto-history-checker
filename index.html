@@ -2540,14 +2540,72 @@ async function loadEuromillionsData() {
       });
     }
 
-    function getPrizeTable() {
-      return currentGame === 'lotto'
-        ? { 3: 30, 4: 140, 5: 1750, 6: 1000000 }
-        : currentGame === 'euromillions'
-          ? { 2: 4, 3: 9, 4: 45, 5: 2000 }
-          : currentGame === 'thunderball'
-            ? { 2: 3, 3: 10, 4: 120, 5: 5000 }
-            : { 2: 5, 3: 20, 4: 250, 5: 10000 };
+    function getPrizeTable(gameKey = currentGame) {
+      return gameKey === 'lotto'
+        ? { '3': 30, '4': 140, '5': 1750, '6': 1000000 }
+        : gameKey === 'euromillions'
+          ? {
+              '2+0': 4,
+              '2+1': 6,
+              '2+2': 10,
+              '3+0': 9,
+              '3+1': 14,
+              '3+2': 30,
+              '4+0': 45,
+              '4+1': 80,
+              '4+2': 200,
+              '5+0': 2000,
+              '5+1': 100000,
+              '5+2': 1000000
+            }
+          : gameKey === 'thunderball'
+            ? { '2': 3, '3': 10, '4': 120, '5': 5000 }
+            : { '2': 5, '3': 20, '4': 250, '5': 10000 };
+    }
+
+    function getResultKey(gameKey, mainMatches, bonusMatches = 0) {
+      if (gameKey === 'euromillions') {
+        if (mainMatches < 2) return null;
+        return `${mainMatches}+${bonusMatches}`;
+      }
+      return mainMatches >= 2 ? String(mainMatches) : null;
+    }
+
+    function getPrizeForMatches(gameKey, mainMatches, bonusMatches = 0) {
+      const table = getPrizeTable(gameKey);
+      const key = getResultKey(gameKey, mainMatches, bonusMatches);
+      return key ? (table[key] || 0) : 0;
+    }
+
+    function getResultRank(gameKey, mainMatches, bonusMatches = 0) {
+      if (gameKey === 'euromillions') return (mainMatches * 10) + bonusMatches;
+      return mainMatches;
+    }
+
+    function formatResultLabel(gameKey, mainMatches, bonusMatches = 0) {
+      if (!mainMatches) return '—';
+      if (gameKey === 'euromillions') {
+        const starWord = bonusMatches === 1 ? 'star' : 'stars';
+        return `${mainMatches} + ${bonusMatches} ${starWord}`;
+      }
+      return `${mainMatches} main match${mainMatches > 1 ? 'es' : ''}`;
+    }
+
+    function renderBreakdownRowsForGame(gameKey, buckets, game) {
+      if (gameKey === 'euromillions') {
+        const orderedKeys = ['5+2', '5+1', '5+0', '4+2', '4+1', '4+0', '3+2', '3+1', '3+0', '2+2', '2+1', '2+0'];
+        return orderedKeys.map(key => {
+          const [main, bonus] = key.split('+').map(Number);
+          const label = `${main} main + ${bonus} ${bonus === 1 ? 'star' : 'stars'}`;
+          return `<div class="stats-row"><span>${label}</span><strong>${(buckets[key] || 0).toLocaleString()}</strong></div>`;
+        }).join('');
+      }
+
+      const rows = [];
+      for (let i = game.mainCount; i >= 2; i--) {
+        rows.push(`<div class="stats-row"><span>${i} main match${i > 1 ? 'es' : ''}</span><strong>${(buckets[String(i)] || 0).toLocaleString()}</strong></div>`);
+      }
+      return rows.join('');
     }
 
     function renderPickedLine(numbers, type = 'main') {
@@ -3475,15 +3533,7 @@ function formatMoney(amount) {
 }
 
 function renderBreakdownRows(maxMain, buckets, bonusCount = 0, bonusLabel = 'bonus') {
-  const rows = [];
-  for (let i = maxMain; i >= 1; i--) {
-    let label = `${i} main match${i > 1 ? 'es' : ''}`;
-    if (bonusCount > 0 && i === maxMain - 1) {
-      label += ` + ${bonusLabel.toLowerCase()}`;
-    }
-    rows.push(`<div class="stats-row"><span>${label}</span><strong>${(buckets[i] || 0).toLocaleString()}</strong></div>`);
-  }
-  return rows.join('');
+  return renderBreakdownRowsForGame(currentGame, buckets, games[currentGame]);
 }
 
 function renderDashboardResults(opts) {
@@ -3603,32 +3653,30 @@ function renderDashboardResults(opts) {
   }
 
   const ticketPrice = game.ticketPrice || 2;
-  const prizeTable = getPrizeTable();
 
   let exactWin = null;
   let closestMain = 0;
-  let closestDate = null;
-  let closestPrize = 0;
+  let closestBonus = 0;
   let totalWinnings = 0;
   const buckets = {};
 
   for (let i = 0; i < draws.length; i++) {
     const draw = draws[i];
     const mainMatches = fastMatch(selectedMain, drawSets[i]);
+    const bonusMatches = hasBonus ? fastMatch(selectedBonus, bonusSets[i]) : 0;
+    const resultKey = getResultKey(currentGame, mainMatches, bonusMatches);
 
-    buckets[mainMatches] = (buckets[mainMatches] || 0) + 1;
+    if (resultKey) {
+      buckets[resultKey] = (buckets[resultKey] || 0) + 1;
+      totalWinnings += getPrizeForMatches(currentGame, mainMatches, bonusMatches);
+    }
 
-    const prizeWon = prizeTable[mainMatches] || 0;
-    totalWinnings += prizeWon;
-
-    if (mainMatches > closestMain) {
+    if (getResultRank(currentGame, mainMatches, bonusMatches) > getResultRank(currentGame, closestMain, closestBonus)) {
       closestMain = mainMatches;
-      closestDate = draw.date;
-      closestPrize = prizeWon;
+      closestBonus = bonusMatches;
     }
 
     const exactMain = mainMatches === game.mainCount;
-    const bonusMatches = hasBonus ? fastMatch(selectedBonus, bonusSets[i]) : 0;
     const exactBonus = hasBonus ? bonusMatches === game.bonusCount : true;
 
     if (exactMain && exactBonus) {
@@ -3649,7 +3697,7 @@ function renderDashboardResults(opts) {
     totalWinnings,
     profitLoss,
     exactJackpotDate: exactWin,
-    closestLabel: closestMain ? `${closestMain} main matches` : '—',
+    closestLabel: formatResultLabel(currentGame, closestMain, closestBonus),
     breakdownRows
   });
   scrollToResultBox(historyResultsBox);
@@ -3755,25 +3803,22 @@ function runPickerCheck() {
       const draws = game.draws;
       const drawSets = game.drawSets;
       const bonusSets = game.bonusSets;
-      const prizeTable = getPrizeTable();
 
       let exactWin = null;
       let closestMain = 0;
-      let closestDate = null;
-      let closestPrize = 0;
+      let closestBonus = 0;
 
       for (let i = 0; i < draws.length; i++) {
         const draw = draws[i];
         const mainMatches = fastMatch(selectedMain, drawSets[i]);
+        const bonusMatches = hasBonus ? fastMatch(selectedBonus, bonusSets[i]) : 0;
 
-        if (mainMatches > closestMain) {
+        if (getResultRank(currentGame, mainMatches, bonusMatches) > getResultRank(currentGame, closestMain, closestBonus)) {
           closestMain = mainMatches;
-          closestDate = draw.date;
-          closestPrize = prizeTable[mainMatches] || 0;
+          closestBonus = bonusMatches;
         }
 
         const exactMain = mainMatches === game.mainCount;
-        const bonusMatches = hasBonus ? fastMatch(selectedBonus, bonusSets[i]) : 0;
         const exactBonus = hasBonus ? bonusMatches === game.bonusCount : true;
 
         if (exactMain && exactBonus) {
@@ -3787,8 +3832,12 @@ function runPickerCheck() {
 
       for (let i = 0; i < draws.length; i++) {
         const mainMatches = fastMatch(selectedMain, drawSets[i]);
-        buckets[mainMatches] = (buckets[mainMatches] || 0) + 1;
-        totalWinnings += prizeTable[mainMatches] || 0;
+        const bonusMatches = hasBonus ? fastMatch(selectedBonus, bonusSets[i]) : 0;
+        const resultKey = getResultKey(currentGame, mainMatches, bonusMatches);
+        if (resultKey) {
+          buckets[resultKey] = (buckets[resultKey] || 0) + 1;
+          totalWinnings += getPrizeForMatches(currentGame, mainMatches, bonusMatches);
+        }
       }
 
       const totalCost = draws.length * ticketPrice;
@@ -3803,7 +3852,7 @@ function runPickerCheck() {
         totalWinnings,
         profitLoss,
         exactJackpotDate: exactWin,
-        closestLabel: closestMain ? `${closestMain} main matches` : '—',
+        closestLabel: formatResultLabel(currentGame, closestMain, closestBonus),
         breakdownRows,
         includeLineRows: true,
         mainLineHtml: renderPickedLine(selectedMain, 'main'),
@@ -3892,9 +3941,8 @@ function runPickerCheck() {
     return;
   }
 
-  const prizeTable = getPrizeTable();
-
   let bestMatch = 0;
+  let bestBonusMatch = 0;
   let totalWinnings = 0;
   let jackpotWins = 0;
   let bestTicketDate = null;
@@ -3904,12 +3952,12 @@ function runPickerCheck() {
   let bestTicketMatchedBonusNumbers = null;
 
   const challengeBuckets = {};
-  for (let i = 0; i <= game.mainCount; i++) challengeBuckets[i] = 0;
 
   for (let t = 0; t < challengeTickets; t++) {
     const ticket = randomUnique(game.mainMax, game.mainCount);
     const ticketBonus = game.bonusCount > 0 ? randomUnique(game.bonusMax, game.bonusCount) : [];
     let ticketBest = 0;
+    let ticketBestBonus = 0;
     let ticketBestDate = null;
     let ticketBestMatchedNumbers = [];
     let ticketBestMatchedBonusNumbers = [];
@@ -3920,21 +3968,28 @@ function runPickerCheck() {
       const drawBonus = game.draws[i]?.bonus || [];
       const matchedBonusNumbers = ticketBonus.filter(n => drawBonus.includes(n));
       const m = matchedNumbers.length;
+      const b = matchedBonusNumbers.length;
+      const resultKey = getResultKey(currentGame, m, b);
 
-      if (m > ticketBest) {
+      if (getResultRank(currentGame, m, b) > getResultRank(currentGame, ticketBest, ticketBestBonus)) {
         ticketBest = m;
+        ticketBestBonus = b;
         ticketBestDate = draws[i]?.date || null;
         ticketBestMatchedNumbers = [...matchedNumbers];
         ticketBestMatchedBonusNumbers = [...matchedBonusNumbers];
       }
 
-      if (m > 0) challengeBuckets[m] = (challengeBuckets[m] || 0) + 1;
-      if (m === game.mainCount) jackpotWins++;
-      totalWinnings += (prizeTable[m] || 0);
+      if (resultKey) {
+        challengeBuckets[resultKey] = (challengeBuckets[resultKey] || 0) + 1;
+        totalWinnings += getPrizeForMatches(currentGame, m, b);
+      }
+
+      if (m === game.mainCount && (!game.bonusCount || b === game.bonusCount)) jackpotWins++;
     }
 
-    if (ticketBest > bestMatch) {
+    if (getResultRank(currentGame, ticketBest, ticketBestBonus) > getResultRank(currentGame, bestMatch, bestBonusMatch)) {
       bestMatch = ticketBest;
+      bestBonusMatch = ticketBestBonus;
       bestTicketNumbers = [...ticket];
       bestTicketBonusNumbers = [...ticketBonus];
       bestTicketDate = ticketBestDate;
@@ -3945,7 +4000,7 @@ function runPickerCheck() {
 
   const totalCost = challengeTickets * draws.length * ticketPrice;
   const profitLoss = totalWinnings - totalCost;
-  const bestMatchCount = bestMatch > 0 ? (challengeBuckets[bestMatch] || 0) : 0;
+  const bestMatchCount = bestMatch ? (challengeBuckets[getResultKey(currentGame, bestMatch, bestBonusMatch)] || 0) : 0;
   const bestTicketHtml = bestTicketNumbers
     ? `<div class="compact-ball-row">${bestTicketNumbers.map(n => `<span class="picked-ball main compact-ball ${bestTicketMatchedNumbers && bestTicketMatchedNumbers.includes(n) ? 'match' : ''}">${n}</span>`).join('')}</div>`
     : '<div class="picked-line empty">—</div>';
@@ -3997,7 +4052,7 @@ function runPickerCheck() {
           </span>
           <span class="breakdown-hint">Click to expand</span>
         </summary>
-        <div class="stats-list">${renderBreakdownRows(game.mainCount, challengeBuckets, game.bonusCount, game.bonusLabel)}</div>
+        <div class="stats-list">${renderBreakdownRowsForGame(currentGame, challengeBuckets, game)}</div>
       </details>
 
       <details class="breakdown-toggle">
@@ -4009,7 +4064,7 @@ function runPickerCheck() {
           <span class="breakdown-hint">Click to expand</span>
         </summary>
         <div class="stats-list">
-          <div class="stats-row"><span>Best result</span><strong>${bestMatch ? `${bestMatch} match${bestMatch > 1 ? 'es' : ''}` : 'N/A'}</strong></div>
+          <div class="stats-row"><span>Best result</span><strong>${bestMatch ? formatResultLabel(currentGame, bestMatch, bestBonusMatch) : 'N/A'}</strong></div>
           <div class="stats-row"><span>Times it happened</span><strong>${bestMatchCount.toLocaleString()}</strong></div>
           <div class="stats-row"><span>Main ticket</span><div>${bestTicketHtml}</div></div>
           ${game.bonusCount > 0 ? `<div class="stats-row"><span>${game.bonusLabel}</span><div>${bestTicketBonusHtml}</div></div>` : ''}
