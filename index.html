@@ -2617,11 +2617,13 @@ async function loadEuromillionsData() {
       if (gameKey === 'euromillions') {
         const rows = [];
         for (let main = game.mainCount; main >= 2; main--) {
-          let total = 0;
-          for (let bonus = 0; bonus <= game.bonusCount; bonus++) {
-            total += buckets[`${main}+${bonus}`] || 0;
+          for (let bonus = game.bonusCount; bonus >= 0; bonus--) {
+            const key = `${main}+${bonus}`;
+            const label = bonus === 0
+              ? `${main} main`
+              : `${main} main + ${bonus} ${bonus === 1 ? 'star' : 'stars'}`;
+            rows.push(`<div class="stats-row"><span>${label}</span><strong>${(buckets[key] || 0).toLocaleString()}</strong></div>`);
           }
-          rows.push(`<div class="stats-row"><span>${main} main</span><strong>${total.toLocaleString()}</strong></div>`);
         }
         return rows.join('');
       }
