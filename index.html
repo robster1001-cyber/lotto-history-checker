@@ -2173,6 +2173,115 @@
       }
     }
 
+
+
+    .bulk-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .bulk-head-copy {
+      min-width: 0;
+    }
+
+    .bulk-meta-toggle {
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .bulk-meta-toggle summary {
+      list-style: none;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-weight: 800;
+      color: #dbeafe;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      user-select: none;
+    }
+
+    .bulk-meta-toggle summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .bulk-meta-toggle[open] summary {
+      background: rgba(96,165,250,0.16);
+      border-color: rgba(96,165,250,0.34);
+      color: #ffffff;
+    }
+
+    .bulk-meta-panel {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: min(290px, calc(100vw - 72px));
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(15, 23, 42, 0.98);
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 14px 30px rgba(0,0,0,0.28);
+      color: #dbeafe;
+      line-height: 1.45;
+      z-index: 30;
+    }
+
+    .bulk-meta-panel strong {
+      color: #ffffff;
+    }
+
+    .bulk-meta-panel .muted {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.84rem;
+      color: #94a3b8;
+    }
+
+    .profit-loss-pulse-in {
+      animation: profitLossPulseIn 0.95s ease-out 1.2s both;
+      transform-origin: center center;
+    }
+
+    @keyframes profitLossPulseIn {
+      0% {
+        transform: scale(0.96);
+        box-shadow: 0 0 0 rgba(242,201,76,0);
+      }
+      45% {
+        transform: scale(1.03);
+        box-shadow:
+          0 0 0 2px rgba(242,201,76,0.18),
+          0 0 18px rgba(242,201,76,0.18),
+          0 0 38px rgba(242,201,76,0.08);
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(242,201,76,0);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .bulk-head {
+        gap: 10px;
+      }
+
+      .bulk-meta-toggle summary {
+        width: 30px;
+        height: 30px;
+      }
+
+      .bulk-meta-panel {
+        width: min(260px, calc(100vw - 58px));
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -4069,14 +4178,28 @@ function runPickerCheck() {
 
   challengeResultsBox.innerHTML = `
     <div class="kicker">Bulk Buy result</div>
-    <h3 style="margin-bottom:6px;">
-      ${challengeTickets.toLocaleString()} tickets tested
-    </h3>
-    <p class="muted" style="margin:0 0 12px;">
-      Across full draw history
-    </p>
+    <div class="bulk-head">
+      <div class="bulk-head-copy">
+        <h3 style="margin-bottom:6px;">
+          ${challengeTickets.toLocaleString()} tickets tested
+        </h3>
+        <p class="muted" style="margin:0;">
+          Across full draw history
+        </p>
+      </div>
+      <details class="bulk-meta-toggle">
+        <summary aria-label="More Bulk Buy info">?</summary>
+        <div class="bulk-meta-panel">
+          <div><strong>Game:</strong> ${game.label}</div>
+          <div><strong>Ticket price used:</strong> ${formatTicketPrice(ticketPrice)}</div>
+          <div><strong>Lines tested:</strong> ${(challengeTickets * draws.length).toLocaleString()}</div>
+          <div><strong>Dataset basis:</strong> full recorded draw history loaded in this app</div>
+          <span class="muted">Geek corner: lines tested = tickets × draws, so every random ticket gets run against every real draw in the dataset.</span>
+        </div>
+      </details>
+    </div>
     <div class="result-headline">
-      <div class="hero-stat ${profitLoss >= 0 ? 'positive' : 'negative'}">
+      <div class="hero-stat profit-loss-pulse-in ${profitLoss >= 0 ? 'positive' : 'negative'}">
         <div class="label">Profit / loss</div>
         <div class="value">${formatMoney(profitLoss)}</div>      </div>
 
