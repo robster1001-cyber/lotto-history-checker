@@ -2617,13 +2617,11 @@ async function loadEuromillionsData() {
       if (gameKey === 'euromillions') {
         const rows = [];
         for (let main = game.mainCount; main >= 2; main--) {
-          for (let bonus = game.bonusCount; bonus >= 0; bonus--) {
-            const key = `${main}+${bonus}`;
-            const label = bonus === 0
-              ? `${main} main`
-              : `${main} main + ${bonus} ${bonus === 1 ? 'star' : 'stars'}`;
-            rows.push(`<div class="stats-row"><span>${label}</span><strong>${(buckets[key] || 0).toLocaleString()}</strong></div>`);
+          let total = 0;
+          for (let bonus = 0; bonus <= game.bonusCount; bonus++) {
+            total += buckets[`${main}+${bonus}`] || 0;
           }
+          rows.push(`<div class="stats-row"><span>${main} main</span><strong>${total.toLocaleString()}</strong></div>`);
         }
         return rows.join('');
       }
@@ -4069,10 +4067,12 @@ function runPickerCheck() {
 
   challengeResultsBox.innerHTML = `
     <div class="kicker">Bulk Buy result</div>
-    <h3 style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
-      <span>${challengeTickets.toLocaleString()} ${game.label} tickets tested</span>
-      <span style="font-size:0.86rem;font-weight:800;color:var(--muted);padding-top:4px;">From ${game.label} launch • ${formatTicketPrice(ticketPrice)} per ticket</span>
+    <h3 style="margin-bottom:6px;">
+      ${challengeTickets.toLocaleString()} tickets tested
     </h3>
+    <p class="muted" style="margin:0 0 12px;">
+      Across full draw history
+    </p>
     <div class="result-headline">
       <div class="hero-stat ${profitLoss >= 0 ? 'positive' : 'negative'}">
         <div class="label">Profit / loss</div>
