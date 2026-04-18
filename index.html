@@ -4242,6 +4242,23 @@ function clearSelections() {
       document.querySelectorAll('.card-help').forEach(btn => btn.classList.remove('active'));
     }
 
+    function selectChallengeGame(gameKey) {
+      document.querySelectorAll('[data-challenge-game]').forEach(x => x.classList.remove('active-game'));
+      const activeBtn = document.querySelector(`[data-challenge-game="${gameKey}"]`);
+      if (activeBtn) activeBtn.classList.add('active-game');
+      currentGame = gameKey;
+      challengeGameChosen = true;
+      resetChallengeBox();
+      hideChallengeRunStatus();
+      renderChallengeSelectionState();
+      updateResultsVisibility(currentFeature);
+      triggerGoldReveal(challengeControlsWrap);
+      syncChallengeSliderUI(true);
+      setTimeout(() => {
+        if (challengeControlsWrap) challengeControlsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 70);
+    }
+
     function switchFeature(feature) {
       currentFeature = feature;
       const appRoot = document.querySelector('.app');
@@ -4254,35 +4271,6 @@ function clearSelections() {
       }
       collapseHomeEntry();
       closeHomeCardHelp();
-
-  
-    document.querySelectorAll('[data-challenge-game]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('[data-challenge-game]').forEach(x => x.classList.remove('active-game'));
-        btn.classList.add('active-game');
-        currentGame = btn.dataset.challengeGame;
-        challengeGameChosen = true;
-        resetChallengeBox();
-        hideChallengeRunStatus();
-        renderChallengeSelectionState();
-        updateResultsVisibility(currentFeature);
-        triggerGoldReveal(challengeControlsWrap);
-        syncChallengeSliderUI(true);
-        setTimeout(() => {
-          if (challengeControlsWrap) challengeControlsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 70);
-      });
-    });
-
-    if (challengeTicketSlider) {
-      challengeTicketSlider.addEventListener('input', () => {
-        syncChallengeSliderUI(false);
-      });
-      challengeTicketSlider.addEventListener('change', () => {
-        syncChallengeSliderUI(true);
-      });
-    }
-
 
     document.querySelectorAll('[data-ticket-game]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -4427,6 +4415,19 @@ function clearSelections() {
     document.querySelectorAll('.feature-card').forEach(card => {
       card.addEventListener('click', () => switchFeature(card.dataset.feature));
     });
+
+    document.querySelectorAll('[data-challenge-game]').forEach(btn => {
+      btn.addEventListener('click', () => selectChallengeGame(btn.dataset.challengeGame));
+    });
+
+    if (challengeTicketSlider) {
+      challengeTicketSlider.addEventListener('input', () => {
+        syncChallengeSliderUI(false);
+      });
+      challengeTicketSlider.addEventListener('change', () => {
+        syncChallengeSliderUI(true);
+      });
+    }
 
     document.querySelectorAll('.card-help').forEach(btn => {
       const openHelp = (event) => {
