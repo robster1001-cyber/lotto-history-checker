@@ -3963,6 +3963,17 @@ function runPickerCheck() {
 
     async function runChallenge() {
 
+  if (!challengeGameChosen) {
+    challengeResultsBox.innerHTML = `
+      <div class="kicker">Bulk Buy result</div>
+      <h3>Pick a game first</h3>
+      <p class="muted">Choose UK Lotto, EuroMillions, Thunderball or Set For Life before hitting Play Now.</p>
+    `;
+    updateResultsVisibility('challenge');
+    scrollToResultBox(challengeResultsBox);
+    return;
+  }
+
   showChallengeRunStatus();
   await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 20)));
 
@@ -3979,6 +3990,7 @@ function runPickerCheck() {
     `;
     setChallengeResultsDimmed(false);
     hideChallengeRunStatus('Nothing to run there just yet.');
+    updateResultsVisibility('challenge');
     scrollToResultBox(challengeResultsBox);
     updateResultsBackTopVisibility();
     return;
@@ -4122,6 +4134,7 @@ function runPickerCheck() {
   `;
   setChallengeResultsDimmed(false);
   hideChallengeRunStatus('Done. That hurt.');
+  updateResultsVisibility('challenge');
   scrollToResultBox(challengeResultsBox);
   updateResultsBackTopVisibility();
 }
@@ -4251,7 +4264,7 @@ function clearSelections() {
       resetChallengeBox();
       hideChallengeRunStatus();
       renderChallengeSelectionState();
-      updateResultsVisibility(currentFeature);
+      updateResultsVisibility('challenge');
       triggerGoldReveal(challengeControlsWrap);
       syncChallengeSliderUI(true);
       setTimeout(() => {
