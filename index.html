@@ -767,6 +767,21 @@
       width: 74px;
     }
 
+    .date-input-help {
+      margin: 0 0 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+
+    #dobSection input,
+    #customDateSection input {
+      width: 100%;
+      max-width: 320px;
+      min-height: 48px;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -2417,9 +2432,11 @@
               <button id="startCustomBtn" type="button">Custom date</button>
             </div>
             <div id="dobSection" class="hidden">
+              <p class="date-input-help">Enter your date of birth so we can work out when you turned 18.</p>
               <input type="date" id="dobInput" />
             </div>
             <div id="customDateSection" class="hidden">
+              <p class="date-input-help">Choose the date you want to start checking from.</p>
               <input type="date" id="startDateInput" />
             </div>
           </div>
@@ -3674,6 +3691,23 @@ function renderPickerNumbers() {
       document.getElementById('startCustomBtn').classList.toggle('active-game', mode === 'custom');
       document.getElementById('dobSection').classList.toggle('hidden', mode !== '18');
       document.getElementById('customDateSection').classList.toggle('hidden', mode !== 'custom');
+
+      const dobInput = document.getElementById('dobInput');
+      const startDateInput = document.getElementById('startDateInput');
+      const gameStart = games[currentGame]?.startDate || '1994-11-19';
+      const today = new Date().toISOString().slice(0, 10);
+
+      if (dobInput) {
+        dobInput.max = today;
+      }
+
+      if (startDateInput) {
+        startDateInput.min = gameStart;
+        startDateInput.max = today;
+        if (mode === 'custom' && !startDateInput.value) {
+          startDateInput.value = gameStart;
+        }
+      }
     }
 
     function getStartDateLabelAndValue() {
