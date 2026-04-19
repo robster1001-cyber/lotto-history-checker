@@ -1399,13 +1399,14 @@
 
 
     .results-back-top {
-      position: sticky;
-      bottom: 14px;
-      margin-top: 12px;
-      margin-left: auto;
+      position: static;
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
+      width: fit-content;
+      min-width: 96px;
+      margin: 12px auto 0;
       padding: 10px 14px;
       border-radius: 999px;
       background: rgba(15, 23, 42, 0.94);
@@ -1413,7 +1414,7 @@
       color: #dbeafe;
       box-shadow: 0 10px 24px rgba(0,0,0,0.22);
       backdrop-filter: blur(8px);
-      z-index: 20;
+      z-index: 1;
     }
 
     .results-back-top.hidden {
@@ -1422,7 +1423,8 @@
 
     @media (max-width: 620px) {
       .results-back-top {
-        bottom: 10px;
+        min-width: 90px;
+        margin-top: 12px;
         padding: 11px 14px;
       }
     }
@@ -2606,7 +2608,7 @@
           <p class="muted" id="selectedGameDrawCount" style="margin: 6px 0 12px;">Historical draws loaded: —</p>
           <div class="stats-list">
             <div class="stats-row"><span>Main line</span><div id="resultMainLine" style="max-width:100%;">—</div></div>
-            </div>
+            <div class="stats-row"><span id="resultBonusLabel">Bonus line</span><div id="resultBonusLine" style="max-width:100%;">—</div></div>
           </div>
         </div>
 
@@ -3233,7 +3235,12 @@ function pickFromPool(pool, count) {
         : '';
 
       resultMainLine.innerHTML = renderPickedLine(selectedMain, 'main');
-      if (resultBonusLabel) resultBonusLabel.textContent = hasBonus ? game.bonusLabel : '</div>';
+      const resultBonusRow = resultBonusLabel ? resultBonusLabel.closest('.stats-row') : null;
+      if (resultBonusRow) resultBonusRow.classList.toggle('hidden', !hasBonus);
+      if (resultBonusLabel) resultBonusLabel.textContent = hasBonus ? game.bonusLabel : 'Bonus line';
+      resultBonusLine.innerHTML = hasBonus
+        ? renderPickedLine(selectedBonus, 'bonus')
+        : '';
 
       selectedGameLabel.textContent = game.label;
       if (selectedGameDrawCount) selectedGameDrawCount.textContent = getCurrentGameDrawCountLabel();
@@ -3983,7 +3990,7 @@ function applyPicker(type) {
     <p class="muted">${verdict.explanation}</p>
     <div class="stats-list">
       <div class="stats-row"><span>Main line</span><div>${renderPickedLine(selectedMain, 'main')}</div></div>
-      <div class="stats-row"><span>${game.bonusCount > 0 ? game.bonusLabel : '</strong>'}</div></div>
+      <div class="stats-row"><span>${game.bonusCount > 0 ? game.bonusLabel : 'Bonus line'}</span><div>${game.bonusCount > 0 ? renderPickedLine(selectedBonus, 'bonus') : '<strong>Not applicable</strong>'}</div></div>
       <div class="stats-row"><span>Hot numbers in line</span><strong>${verdict.hotCount}</strong></div>
       <div class="stats-row"><span>Cold numbers in line</span><strong>${verdict.coldCount}</strong></div>
       <div class="stats-row"><span>Overdue numbers in line</span><strong>${verdict.overdueCount}</strong></div>
@@ -4064,7 +4071,8 @@ function runPickerCheck() {
         breakdownRows,
         includeLineRows: true,
         mainLineHtml: renderPickedLine(selectedMain, 'main'),
-        bonusLabel: game.bonusCount > 0 ? game.bonusLabel : '</strong>'
+        bonusLabel: game.bonusCount > 0 ? game.bonusLabel : 'Bonus line',
+        bonusLineHtml: game.bonusCount > 0 ? renderPickedLine(selectedBonus, 'bonus') : '<strong>Not applicable</strong>'
       });
       scrollToResultBox(pickerResultsBox);
       updateResultsBackTopVisibility();
