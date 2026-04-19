@@ -1163,6 +1163,39 @@
       box-shadow: none;
     }
 
+    .selected-line-compact {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 6px;
+      align-items: center;
+      justify-content: flex-end;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .selected-line-compact .picked-ball {
+      min-width: 30px;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      font-size: 0.82rem;
+      flex: 0 0 30px;
+    }
+
+    @media (max-width: 620px) {
+      .selected-line-compact {
+        gap: 4px;
+      }
+
+      .selected-line-compact .picked-ball {
+        min-width: 28px;
+        width: 28px;
+        height: 28px;
+        font-size: 0.78rem;
+        flex: 0 0 28px;
+      }
+    }
+
     .compact-ball.match {
       background: linear-gradient(180deg, #fde68a 0%, #f2c94c 100%);
       color: #111827;
@@ -3234,7 +3267,9 @@ function pickFromPool(pool, count) {
         ? `${game.bonusLabel}: ${selectedBonus.length ? sortNums(selectedBonus).join(', ') : 'none selected'}`
         : '';
 
-      resultMainLine.innerHTML = renderPickedLine(selectedMain, 'main');
+      resultMainLine.innerHTML = selectedMain.length
+        ? `<div class="selected-line-compact">${sortNums(selectedMain).map(n => `<span class="picked-ball main">${n}</span>`).join('')}</div>`
+        : renderPickedLine(selectedMain, 'main');
       const resultBonusRow = resultBonusLabel ? resultBonusLabel.closest('.stats-row') : null;
       if (resultBonusRow) resultBonusRow.classList.toggle('hidden', !hasBonus);
       if (resultBonusLabel) resultBonusLabel.textContent = hasBonus ? game.bonusLabel : 'Bonus line';
