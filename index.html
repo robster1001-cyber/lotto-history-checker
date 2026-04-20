@@ -2359,6 +2359,10 @@
       display: none !important;
     }
 
+    .picker-reveal-hidden {
+      display: none !important;
+    }
+
     .ticket-history-hidden {
       display: none !important;
     }
@@ -2799,7 +2803,7 @@
             </div>
           </div>
 
-          <div class="button-group-shell">
+          <div class="button-group-shell picker-reveal-hidden" id="pickerControlsWrap">
             <div class="section-label">Play style</div>
             <div class="btn-row picker-style-row">
               <button id="pickerLuckyBtn" class="picker-style-btn"><span class="label-text">Lucky Pick</span><span class="mode-help" data-style="lucky" data-title="Lucky Pick" data-tip="A proper no-nonsense random line. Great if you just want the machine to choose and crack on." role="button" tabindex="0" aria-label="Explain Lucky Pick">?</span></button>
@@ -3161,6 +3165,7 @@ async function loadEuromillionsData() {
     let challengeRunStatusTimer = null;
     let checkGameChosen = false;
     let challengeGameChosen = false;
+    let pickerGameChosen = false;
     let ticketGameChosen = false;
 
     const mainGrid = document.getElementById('mainGrid');
@@ -3200,6 +3205,7 @@ async function loadEuromillionsData() {
     const homeCardHelpBody = document.getElementById('homeCardHelpBody');
     const homeCardHelpClose = document.getElementById('homeCardHelpClose');
     const challengeControlsWrap = document.getElementById('challengeControlsWrap');
+    const pickerControlsWrap = document.getElementById('pickerControlsWrap');
     const challengeTicketValue = document.getElementById('challengeTicketValue');
     const challengeTicketMood = document.getElementById('challengeTicketMood');
     const challengeTicketSlider = document.getElementById('challengeTicketSlider');
@@ -3335,6 +3341,15 @@ function pickFromPool(pool, count) {
       if (challengeGameChosen) syncChallengeSliderUI(false);
     }
 
+    function renderPickerSelectionState() {
+      if (!pickerControlsWrap) return;
+      pickerControlsWrap.classList.toggle('picker-reveal-hidden', !pickerGameChosen);
+      if (!pickerGameChosen) {
+        setPickerPostStyleVisibility(false);
+        closePickerHelp();
+      }
+    }
+
     function setHistoryResultsDimmed(dimmed = true) {
       historyResultsBox.classList.toggle('results-dimmed', dimmed);
     }
@@ -3400,7 +3415,7 @@ function pickFromPool(pool, count) {
       const historyHasContent = historyResultsBox.innerHTML.trim() !== '';
       const pickerHasContent = pickerResultsBox.innerHTML.trim() !== '';
       const challengeHasContent = challengeResultsBox.innerHTML.trim() !== '';
-      const hideRightPanel = feature === 'stats' || feature === 'ticket' || (feature === 'check' && !checkGameChosen) || (feature === 'challenge' && !challengeHasContent);
+      const hideRightPanel = feature === 'stats' || feature === 'ticket' || (feature === 'check' && !checkGameChosen) || (feature === 'picker' && !pickerHasContent) || (feature === 'challenge' && !challengeHasContent);
       if (rightPanel) rightPanel.classList.toggle('hidden', hideRightPanel);
 
       selectedGameBox.classList.toggle('hidden', feature !== 'check');
@@ -4748,6 +4763,10 @@ function clearSelections() {
       } else {
         document.getElementById('bonusSection').classList.toggle('hidden', !hasBonus);
       }
+
+      if (currentFeature === 'picker') {
+        renderPickerSelectionState();
+      }
     }
 
 
@@ -4892,6 +4911,13 @@ function clearSelections() {
         renderChallengeSelectionState();
       }
 
+      if (feature === 'picker') {
+        pickerGameChosen = false;
+        document.querySelectorAll('#pickerSection [data-game]').forEach(x => x.classList.remove('active-game'));
+        renderPickerSelectionState();
+        resetPickerBox();
+      }
+
       if (feature === 'ticket') {
         ticketGameChosen = false;
         document.querySelectorAll('[data-ticket-game]').forEach(x => x.classList.remove('active-game'));
@@ -4971,8 +4997,15 @@ function clearSelections() {
           document.querySelectorAll('#pickerSection [data-game]').forEach(x => x.classList.remove('active-game'));
           btn.classList.add('active-game');
           currentGame = btn.dataset.game;
+          pickerGameChosen = true;
           closePickerHelp();
+          resetPickerBox();
           renderGame();
+          renderPickerSelectionState();
+          triggerGoldReveal(pickerControlsWrap);
+          setTimeout(() => {
+            if (pickerControlsWrap) pickerControlsWrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 70);
           return;
         }
 
@@ -5143,6 +5176,7 @@ function clearSelections() {
       updateHomeFooterDate();
       if (challengeTicketSlider) challengeTicketSlider.value = '0';
       syncChallengeSliderUI(false);
+      document.querySelectorAll('#pickerSection [data-game]').forEach(x => x.classList.remove('active-game'));
       updateResultsVisibility('stats');
       if (workspaceShell) workspaceShell.classList.add('hidden');
       expandHomeEntry();
