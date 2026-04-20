@@ -4104,12 +4104,12 @@ function renderPickerNumbers() {
       const launchDate = games[currentGame]?.startDate || '1994-11-19';
 
       if (startMode === 'launch') {
-        return { label: `Lottery launch (${formatDate(launchDate)})`, date: '' };
+        return { label: `Lottery launch ${formatDate(launchDate)}`, date: '' };
       }
 
       if (startMode === 'custom') {
         const date = document.getElementById('startDateInput').value;
-        return { label: date ? `Custom date (${formatDate(date)})` : 'Custom date not set', date };
+        return { label: date ? `Custom date ${formatDate(date)}` : 'Custom date not set', date };
       }
 
       const dob = document.getElementById('dobInput').value;
@@ -4122,7 +4122,7 @@ function renderPickerNumbers() {
       const date = dobDate.toISOString().slice(0, 10);
 
       return {
-        label: `When you turned 18 (${formatDate(date)})`,
+        label: `When you turned 18 ${formatDate(date)}`,
         date
       };
     }
@@ -4400,7 +4400,7 @@ function runPickerCheck() {
         return;
       }
 
-      const start = { label: `Lottery launch (${formatDate(games[currentGame]?.startDate || '1994-11-19')})`, date: '' };
+      const start = { label: `Lottery launch ${formatDate(games[currentGame]?.startDate || '1994-11-19')}`, date: '' };
       const draws = game.draws;
       const drawSets = game.drawSets;
       const bonusSets = game.bonusSets;
@@ -5138,8 +5138,9 @@ function clearSelections() {
 
     if (resultsBackTopBtn) {
       resultsBackTopBtn.addEventListener('click', () => {
-        fullyResetToHome();
-        resetToHomeAndScroll();
+        if (workspaceShell) {
+          workspaceShell.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     }
 
@@ -5156,8 +5157,9 @@ function clearSelections() {
 
     if (ticketTopBtn) {
       ticketTopBtn.addEventListener('click', () => {
-        fullyResetToHome();
-        resetToHomeAndScroll();
+        if (workspaceShell) {
+          workspaceShell.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       });
     }
 
