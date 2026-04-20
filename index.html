@@ -4460,6 +4460,7 @@ function runPickerCheck() {
         bonusLabel: game.bonusCount > 0 ? game.bonusLabel : 'Bonus line',
         bonusLineHtml: game.bonusCount > 0 ? renderPickedLine(selectedBonus, 'bonus') : '<strong>Not applicable</strong>'
       });
+      updateResultsVisibility('picker');
       scrollToResultBox(pickerResultsBox);
       updateResultsBackTopVisibility();
     }
