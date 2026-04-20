@@ -1800,7 +1800,7 @@
       justify-content: center;
       padding: 24px;
       background:
-        radial-gradient(circle at center, rgba(242,201,76,0.16) 0%, rgba(5, 10, 22, 0.14) 36%, rgba(5, 10, 22, 0.72) 100%);
+        radial-gradient(circle at center, rgba(242,201,76,0.18) 0%, rgba(5, 10, 22, 0.16) 32%, rgba(5, 10, 22, 0.76) 100%);
       backdrop-filter: blur(8px);
       z-index: 1200;
       opacity: 0;
@@ -1814,7 +1814,7 @@
     }
 
     .picker-reveal-card {
-      width: min(440px, 100%);
+      width: min(460px, 100%);
       border-radius: 26px;
       padding: 28px 24px;
       text-align: center;
@@ -1836,21 +1836,37 @@
       position: absolute;
       inset: 0;
       background:
-        linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.08) 46%, rgba(255,255,255,0) 72%);
+        linear-gradient(120deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.12) 46%, rgba(255,255,255,0) 72%);
       transform: translateX(-130%);
       pointer-events: none;
     }
 
-    .picker-reveal-overlay.show .picker-reveal-card {
-      animation: pickerRevealCardIn 0.52s cubic-bezier(.22,1,.36,1) forwards;
+    .picker-reveal-overlay.show .picker-reveal-card::before {
+      animation: pickerRevealShine 0.9s ease 0.16s 1 forwards;
     }
 
-    .picker-reveal-overlay.show .picker-reveal-card::before {
-      animation: pickerRevealShine 0.9s ease 0.14s 1 forwards;
+    .picker-reveal-overlay.show .picker-reveal-card.reveal-lucky {
+      animation: pickerRevealLuckyIn 0.7s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    .picker-reveal-overlay.show .picker-reveal-card.reveal-hot {
+      animation: pickerRevealHotIn 0.62s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    .picker-reveal-overlay.show .picker-reveal-card.reveal-cold {
+      animation: pickerRevealColdIn 0.78s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    .picker-reveal-overlay.show .picker-reveal-card.reveal-chaos {
+      animation: pickerRevealChaosIn 0.9s cubic-bezier(.22,1,.36,1) forwards;
+    }
+
+    .picker-reveal-overlay.show .picker-reveal-card.reveal-overdue {
+      animation: pickerRevealOverdueIn 0.96s cubic-bezier(.22,1,.36,1) forwards;
     }
 
     .picker-reveal-overlay.hiding .picker-reveal-card {
-      animation: pickerRevealCardOut 0.34s ease forwards;
+      animation: pickerRevealCardOut 0.38s ease forwards;
     }
 
     .picker-reveal-kicker {
@@ -1909,25 +1925,107 @@
       font-size: 1rem;
     }
 
-    @keyframes pickerRevealCardIn {
+    @keyframes pickerRevealLuckyIn {
       0% {
         opacity: 0;
-        transform: translateY(30px) scale(0.82);
-        box-shadow:
-          0 10px 20px rgba(0,0,0,0.18),
-          0 0 0 0 rgba(242,201,76,0);
+        transform: translateY(28px) scale(0.2) rotate(-8deg);
+        box-shadow: 0 0 0 rgba(242,201,76,0);
       }
-      55% {
+      62% {
         opacity: 1;
-        transform: translateY(-6px) scale(1.03);
+        transform: translateY(-8px) scale(1.06) rotate(2deg);
         box-shadow:
-          0 30px 60px rgba(0,0,0,0.44),
           0 0 0 4px rgba(242,201,76,0.18),
-          0 0 42px rgba(242,201,76,0.22);
+          0 0 42px rgba(242,201,76,0.3);
       }
       100% {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes pickerRevealHotIn {
+      0% {
+        opacity: 0;
+        transform: translateY(36px) scale(0.18) rotate(-14deg);
+        box-shadow: 0 0 0 rgba(248,113,113,0);
+        filter: brightness(0.92);
+      }
+      48% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1.1) rotate(6deg);
+        box-shadow:
+          0 0 0 4px rgba(248,113,113,0.18),
+          0 0 48px rgba(248,113,113,0.28),
+          0 0 22px rgba(242,201,76,0.18);
+        filter: brightness(1.06);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+        filter: brightness(1);
+      }
+    }
+
+    @keyframes pickerRevealColdIn {
+      0% {
+        opacity: 0;
+        transform: translateY(18px) scale(0.55) rotate(4deg);
+        filter: blur(4px) brightness(1.08);
+      }
+      65% {
+        opacity: 1;
+        transform: translateY(-3px) scale(1.02) rotate(-1deg);
+        filter: blur(0) brightness(1.03);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+        filter: blur(0) brightness(1);
+      }
+    }
+
+    @keyframes pickerRevealChaosIn {
+      0% {
+        opacity: 0;
+        transform: translateY(34px) scale(0.16) rotate(-28deg);
+      }
+      32% {
+        opacity: 1;
+        transform: translateY(-12px) scale(1.08) rotate(14deg);
+      }
+      56% {
+        transform: translateY(4px) scale(0.98) rotate(-8deg);
+      }
+      76% {
+        transform: translateY(-2px) scale(1.02) rotate(4deg);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+      }
+    }
+
+    @keyframes pickerRevealOverdueIn {
+      0% {
+        opacity: 0;
+        transform: translateY(42px) scale(0.22) rotate(-4deg);
+        filter: brightness(0.9);
+      }
+      44% {
+        opacity: 0.92;
+        transform: translateY(8px) scale(0.88) rotate(2deg);
+        filter: brightness(0.98);
+      }
+      72% {
+        opacity: 1;
+        transform: translateY(-6px) scale(1.04) rotate(-1deg);
+        filter: brightness(1.04);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotate(0deg);
+        filter: brightness(1);
       }
     }
 
@@ -2825,7 +2923,7 @@
   </div>
 
   <div class="picker-reveal-overlay hidden" id="pickerRevealOverlay" aria-hidden="true">
-    <div class="picker-reveal-card">
+    <div class="picker-reveal-card reveal-lucky">
       <div class="picker-reveal-kicker">Line personality</div>
       <h3 class="picker-reveal-title" id="pickerRevealTitle">Lucky Pick</h3>
       <div class="picker-reveal-pill mid" id="pickerRevealPill">☕ Mr / Mrs Average</div>
@@ -3662,8 +3760,25 @@ function pickFromPool(pool, count) {
       return headlines[mode] || 'Line personality';
     }
 
+    function getPickerRevealClass(mode) {
+      const classMap = {
+        lucky: 'reveal-lucky',
+        hot: 'reveal-hot',
+        cold: 'reveal-cold',
+        chaos: 'reveal-chaos',
+        overdue: 'reveal-overdue'
+      };
+      return classMap[mode] || 'reveal-lucky';
+    }
+
     function showPickerPersonalityReveal(verdict, mode) {
       if (!pickerRevealOverlay || !pickerRevealTitle || !pickerRevealPill || !pickerRevealText) return Promise.resolve();
+
+      const revealCard = pickerRevealOverlay.querySelector('.picker-reveal-card');
+      if (revealCard) {
+        revealCard.classList.remove('reveal-lucky', 'reveal-hot', 'reveal-cold', 'reveal-chaos', 'reveal-overdue');
+        revealCard.classList.add(getPickerRevealClass(mode));
+      }
 
       pickerRevealTitle.textContent = getPickerModeHeadline(mode);
       pickerRevealPill.className = `picker-reveal-pill ${verdict.tier}`;
@@ -3684,8 +3799,8 @@ function pickFromPool(pool, count) {
             pickerRevealOverlay.classList.remove('hiding');
             pickerRevealOverlay.setAttribute('aria-hidden', 'true');
             resolve();
-          }, 280);
-        }, 1600);
+          }, 380);
+        }, 2000);
       });
     }
 
