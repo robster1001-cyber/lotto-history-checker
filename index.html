@@ -1792,6 +1792,139 @@
       display: none !important;
     }
 
+    .picker-reveal-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(5, 10, 22, 0.46);
+      backdrop-filter: blur(6px);
+      z-index: 1200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .picker-reveal-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .picker-reveal-card {
+      width: min(420px, 100%);
+      border-radius: 24px;
+      padding: 24px 22px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(15,23,42,0.98) 0%, rgba(30,41,59,0.98) 100%);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow:
+        0 20px 44px rgba(0,0,0,0.34),
+        0 0 0 2px rgba(255,255,255,0.03);
+      transform: translateY(10px) scale(0.96);
+      opacity: 0;
+    }
+
+    .picker-reveal-overlay.show .picker-reveal-card {
+      animation: pickerRevealCardIn 0.34s ease forwards;
+    }
+
+    .picker-reveal-overlay.hiding .picker-reveal-card {
+      animation: pickerRevealCardOut 0.28s ease forwards;
+    }
+
+    .picker-reveal-kicker {
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.74rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 800;
+    }
+
+    .picker-reveal-title {
+      margin: 0 0 10px;
+      font-size: clamp(1.6rem, 5vw, 2.2rem);
+      line-height: 1.05;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    .picker-reveal-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      margin: 0 auto 12px;
+      font-weight: 800;
+      font-size: 0.95rem;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .picker-reveal-pill.smart {
+      background: rgba(34,197,94,0.16);
+      color: #bbf7d0;
+      box-shadow: 0 0 18px rgba(34,197,94,0.12);
+    }
+
+    .picker-reveal-pill.mid {
+      background: rgba(242,201,76,0.16);
+      color: #fde68a;
+      box-shadow: 0 0 18px rgba(242,201,76,0.12);
+    }
+
+    .picker-reveal-pill.cold {
+      background: rgba(248,113,113,0.16);
+      color: #fecaca;
+      box-shadow: 0 0 18px rgba(248,113,113,0.12);
+    }
+
+    .picker-reveal-text {
+      margin: 0;
+      color: #dbeafe;
+      line-height: 1.45;
+      font-weight: 600;
+    }
+
+    @keyframes pickerRevealCardIn {
+      0% {
+        opacity: 0;
+        transform: translateY(16px) scale(0.94);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes pickerRevealCardOut {
+      0% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.97);
+      }
+    }
+
+    @media (max-width: 620px) {
+      .picker-reveal-overlay {
+        padding: 18px;
+      }
+
+      .picker-reveal-card {
+        border-radius: 22px;
+        padding: 22px 18px;
+      }
+
+      .picker-reveal-pill {
+        font-size: 0.9rem;
+      }
+    }
+
     @media (max-width: 620px) {
       .picker-actions {
         bottom: 8px;
@@ -2650,6 +2783,15 @@
     </section>
   </div>
 
+  <div class="picker-reveal-overlay hidden" id="pickerRevealOverlay" aria-hidden="true">
+    <div class="picker-reveal-card">
+      <div class="picker-reveal-kicker">Line personality</div>
+      <h3 class="picker-reveal-title" id="pickerRevealTitle">Lucky Pick</h3>
+      <div class="picker-reveal-pill mid" id="pickerRevealPill">☕ Mr / Mrs Average</div>
+      <p class="picker-reveal-text" id="pickerRevealText">A perfectly average-looking line.</p>
+    </div>
+  </div>
+
   <script>
 window.LOTTO_DATA = [];
 window.LOTTO_DATA_READY = false;
@@ -2906,6 +3048,10 @@ async function loadEuromillionsData() {
     const workspaceShell = document.getElementById('workspaceShell');
     const pickerPostStyleArea = document.getElementById('pickerPostStyleArea');
     const pickerGeneratedArea = document.getElementById('pickerGeneratedArea');
+    const pickerRevealOverlay = document.getElementById('pickerRevealOverlay');
+    const pickerRevealTitle = document.getElementById('pickerRevealTitle');
+    const pickerRevealPill = document.getElementById('pickerRevealPill');
+    const pickerRevealText = document.getElementById('pickerRevealText');
     const topResetBtn = document.getElementById('topResetBtn');
     const homeCardsSection = document.getElementById('homeCardsSection');
     const homeFooterNote = document.getElementById('homeFooterNote');
@@ -3464,6 +3610,44 @@ function pickFromPool(pool, count) {
       return { score, tier, phrase, icon, explanation, hotCount, coldCount, overdueCount };
     }
 
+    function getPickerModeHeadline(mode) {
+      const headlines = {
+        lucky: 'Lucky Pick',
+        hot: 'Hot Pick',
+        cold: 'Cold Pick',
+        overdue: 'Overdue Pick',
+        chaos: 'Chaos Pick'
+      };
+      return headlines[mode] || 'Line personality';
+    }
+
+    function showPickerPersonalityReveal(verdict, mode) {
+      if (!pickerRevealOverlay || !pickerRevealTitle || !pickerRevealPill || !pickerRevealText) return Promise.resolve();
+
+      pickerRevealTitle.textContent = getPickerModeHeadline(mode);
+      pickerRevealPill.className = `picker-reveal-pill ${verdict.tier}`;
+      pickerRevealPill.textContent = `${verdict.icon} ${verdict.phrase}`;
+      pickerRevealText.textContent = verdict.explanation;
+
+      pickerRevealOverlay.classList.remove('hidden', 'hiding');
+      pickerRevealOverlay.classList.add('show');
+      pickerRevealOverlay.setAttribute('aria-hidden', 'false');
+
+      return new Promise(resolve => {
+        setTimeout(() => {
+          pickerRevealOverlay.classList.add('hiding');
+          pickerRevealOverlay.classList.remove('show');
+
+          setTimeout(() => {
+            pickerRevealOverlay.classList.add('hidden');
+            pickerRevealOverlay.classList.remove('hiding');
+            pickerRevealOverlay.setAttribute('aria-hidden', 'true');
+            resolve();
+          }, 280);
+        }, 900);
+      });
+    }
+
     function updatePickerVerdict(strategy = 'manual') {
       const pill = document.getElementById('pickerVerdictPill');
       const text = document.getElementById('pickerVerdictText');
@@ -4005,13 +4189,13 @@ function applyPicker(type) {
   updateSelectedDisplay();
   renderIntelligence();
 
-  if (pickerGeneratedArea) {
-    setTimeout(() => {
-      pickerGeneratedArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 90);
-  }
-
   const verdict = analyseTicket(selectedMain, type);
+
+  showPickerPersonalityReveal(verdict, type).then(() => {
+    if (pickerGeneratedArea) {
+      pickerGeneratedArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
 
   pickerResultsBox.innerHTML = `
     <div class="kicker">Picker result</div>
