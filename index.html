@@ -3815,7 +3815,7 @@ function pickFromPool(pool, count) {
             pickerRevealOverlay.setAttribute('aria-hidden', 'true');
             resolve();
           }, 380);
-        }, 2000);
+        }, 2500);
       });
     }
 
@@ -4456,9 +4456,9 @@ function runPickerCheck() {
         closestLabel: formatResultLabel(currentGame, closestMain, closestBonus),
         breakdownRows,
         includeLineRows: true,
-        mainLineHtml: renderPickedLine(selectedMain, 'main'),
+        mainLineHtml: selectedMain.length ? `<div class="selected-line-compact">${sortNums(selectedMain).map(n => `<span class="picked-ball main">${n}</span>`).join('')}</div>` : renderPickedLine(selectedMain, 'main'),
         bonusLabel: game.bonusCount > 0 ? game.bonusLabel : 'Bonus line',
-        bonusLineHtml: game.bonusCount > 0 ? renderPickedLine(selectedBonus, 'bonus') : '<strong>Not applicable</strong>'
+        bonusLineHtml: game.bonusCount > 0 ? (selectedBonus.length ? `<div class="selected-line-compact">${sortNums(selectedBonus).map(n => `<span class="picked-ball bonus">${n}</span>`).join('')}</div>` : renderPickedLine(selectedBonus, 'bonus')) : '<strong>Not applicable</strong>'
       });
       updateResultsVisibility('picker');
       scrollToResultBox(pickerResultsBox);
@@ -5139,7 +5139,8 @@ function clearSelections() {
     if (resultsBackTopBtn) {
       resultsBackTopBtn.addEventListener('click', () => {
         if (workspaceShell) {
-          workspaceShell.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const y = Math.max(0, workspaceShell.getBoundingClientRect().top + window.scrollY - 72);
+          window.scrollTo({ top: y, behavior: 'smooth' });
         }
       });
     }
@@ -5158,7 +5159,8 @@ function clearSelections() {
     if (ticketTopBtn) {
       ticketTopBtn.addEventListener('click', () => {
         if (workspaceShell) {
-          workspaceShell.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const y = Math.max(0, workspaceShell.getBoundingClientRect().top + window.scrollY - 72);
+          window.scrollTo({ top: y, behavior: 'smooth' });
         }
       });
     }
