@@ -2940,6 +2940,8 @@ window.LOTTO_DATA = [];
 window.LOTTO_DATA_READY = false;
 window.EUROMILLIONS_DATA = [];
 window.EUROMILLIONS_DATA_READY = false;
+window.THUNDERBALL_DATA = [];
+window.THUNDERBALL_DATA_READY = false;
 
 async function loadLottoData() {
   if (window.LOTTO_DATA_READY) return window.LOTTO_DATA;
@@ -2959,14 +2961,45 @@ async function loadEuromillionsData() {
   return window.EUROMILLIONS_DATA;
 }
 
+function normaliseThunderballData(rawData) {
+  return (rawData || [])
+    .map(draw => {
+      if (Array.isArray(draw?.main)) {
+        return {
+          date: draw.date,
+          main: draw.main.slice(0, 5).map(Number),
+          bonus: Array.isArray(draw.bonus) ? draw.bonus.slice(0, 1).map(Number) : []
+        };
+      }
+
+      if (Array.isArray(draw?.numbers) && draw.numbers.length >= 6) {
+        return {
+          date: draw.date,
+          main: draw.numbers.slice(0, 5).map(Number),
+          bonus: [Number(draw.numbers[5])]
+        };
+      }
+
+      return null;
+    })
+    .filter(draw => draw && draw.date && draw.main.length === 5 && draw.bonus.length === 1);
+}
+
+async function loadThunderballData() {
+  if (window.THUNDERBALL_DATA_READY) return window.THUNDERBALL_DATA;
+  const response = await fetch('./thunderball_full_1999_2026_combined.json', { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Failed to load Thunderball data: ${response.status}`);
+  const rawData = await response.json();
+  window.THUNDERBALL_DATA = normaliseThunderballData(rawData);
+  window.THUNDERBALL_DATA_READY = true;
+  return window.THUNDERBALL_DATA;
+}
+
     const sampleLotto = window.LOTTO_DATA || [];
 
     const sampleEuro = window.EUROMILLIONS_DATA || [];
 
-    const sampleThunder = window.THUNDERBALL_DATA || [
-      { date: '2020-02-12', main: [4, 9, 17, 22, 31], bonus: [11] },
-      { date: '2019-11-01', main: [7, 14, 19, 22, 33], bonus: [10] }
-    ];
+    const sampleThunder = window.THUNDERBALL_DATA || [];
 
     const sampleSetForLife = window.SETFORLIFE_DATA || [
       { date: '2021-01-04', main: [3, 14, 22, 31, 45], bonus: [7] },
@@ -3137,12 +3170,14 @@ async function loadEuromillionsData() {
       document.getElementById('pickerTestBtn').disabled = true;
 
       try {
-        const [lottoData, euromillionsData] = await Promise.all([
+        const [lottoData, euromillionsData, thunderballData] = await Promise.all([
           loadLottoData(),
-          loadEuromillionsData()
+          loadEuromillionsData(),
+          loadThunderballData()
         ]);
         games.lotto.draws = lottoData;
         games.euromillions.draws = euromillionsData;
+        games.thunderball.draws = thunderballData;
         buildDrawEngine();
         updateHomeFooterDate();
       } finally {
