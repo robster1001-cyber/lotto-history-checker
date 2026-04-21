@@ -2942,6 +2942,8 @@ window.EUROMILLIONS_DATA = [];
 window.EUROMILLIONS_DATA_READY = false;
 window.THUNDERBALL_DATA = [];
 window.THUNDERBALL_DATA_READY = false;
+window.SETFORLIFE_DATA = [];
+window.SETFORLIFE_DATA_READY = false;
 
 async function loadLottoData() {
   if (window.LOTTO_DATA_READY) return window.LOTTO_DATA;
@@ -2987,12 +2989,21 @@ function normaliseThunderballData(rawData) {
 
 async function loadThunderballData() {
   if (window.THUNDERBALL_DATA_READY) return window.THUNDERBALL_DATA;
-  const response = await fetch('./thunderball_full_1999_2026_combined.json', { cache: 'no-store' });
+  const response = await fetch('./thunderball.json', { cache: 'no-store' });
   if (!response.ok) throw new Error(`Failed to load Thunderball data: ${response.status}`);
   const rawData = await response.json();
   window.THUNDERBALL_DATA = normaliseThunderballData(rawData);
   window.THUNDERBALL_DATA_READY = true;
   return window.THUNDERBALL_DATA;
+}
+
+async function loadSetForLifeData() {
+  if (window.SETFORLIFE_DATA_READY) return window.SETFORLIFE_DATA;
+  const response = await fetch('./setforlife.json', { cache: 'no-store' });
+  if (!response.ok) throw new Error(`Failed to load Set For Life data: ${response.status}`);
+  window.SETFORLIFE_DATA = await response.json();
+  window.SETFORLIFE_DATA_READY = true;
+  return window.SETFORLIFE_DATA;
 }
 
     const sampleLotto = window.LOTTO_DATA || [];
@@ -3170,14 +3181,16 @@ async function loadThunderballData() {
       document.getElementById('pickerTestBtn').disabled = true;
 
       try {
-        const [lottoData, euromillionsData, thunderballData] = await Promise.all([
+        const [lottoData, euromillionsData, thunderballData, setForLifeData] = await Promise.all([
           loadLottoData(),
           loadEuromillionsData(),
-          loadThunderballData()
+          loadThunderballData(),
+          loadSetForLifeData()
         ]);
         games.lotto.draws = lottoData;
         games.euromillions.draws = euromillionsData;
         games.thunderball.draws = thunderballData;
+        games.setforlife.draws = setForLifeData;
         buildDrawEngine();
         updateHomeFooterDate();
       } finally {
