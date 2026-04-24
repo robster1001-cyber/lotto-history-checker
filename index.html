@@ -3466,10 +3466,10 @@ function pickFromPool(pool, count) {
       const historyHasContent = historyResultsBox.innerHTML.trim() !== '';
       const pickerHasContent = pickerResultsBox.innerHTML.trim() !== '';
       const challengeHasContent = challengeResultsBox.innerHTML.trim() !== '';
-      const hideRightPanel = feature === 'stats' || feature === 'ticket' || (feature === 'check' && !checkGameChosen) || (feature === 'picker' && !pickerHasContent) || (feature === 'challenge' && !challengeHasContent);
+      const hideRightPanel = feature === 'stats' || feature === 'ticket' || (feature === 'check' && (!checkGameChosen || !historyHasContent)) || (feature === 'picker' && !pickerHasContent) || (feature === 'challenge' && !challengeHasContent);
       if (rightPanel) rightPanel.classList.toggle('hidden', hideRightPanel);
 
-      selectedGameBox.classList.toggle('hidden', feature !== 'check');
+      selectedGameBox.classList.toggle('hidden', feature !== 'check' || !historyHasContent);
       historyResultsBox.classList.toggle('hidden', feature !== 'check' || !historyHasContent);
       pickerResultsBox.classList.toggle('hidden', feature !== 'picker' || !pickerHasContent);
       challengeResultsBox.classList.toggle('hidden', feature !== 'challenge' || !challengeHasContent);
