@@ -3420,14 +3420,16 @@ function pickFromPool(pool, count) {
     function resetHistoryBox() {
   historyResultsBox.innerHTML = '';
   historyResultsBox.classList.add('hidden');
-  setHistoryResultsDimmed(true);
+  setHistoryResultsDimmed(false);
+  updateResultsVisibility(currentFeature);
   updateResultsBackTopVisibility();
 }
 
     function resetChallengeBox() {
   challengeResultsBox.innerHTML = '';
   challengeResultsBox.classList.add('hidden');
-  setChallengeResultsDimmed(true);
+  setChallengeResultsDimmed(false);
+  updateResultsVisibility(currentFeature);
   updateResultsBackTopVisibility();
 }
 
@@ -3437,6 +3439,7 @@ function pickFromPool(pool, count) {
   setPickerPostStyleVisibility(false);
   updatePickerModeUI(null);
   updatePickerVerdict('manual');
+  updateResultsVisibility(currentFeature);
   updateResultsBackTopVisibility();
 }
 
