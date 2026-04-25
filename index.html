@@ -4268,6 +4268,7 @@ function renderDashboardResults(opts) {
       <h3>Line incomplete</h3>
       <p class="muted">Please select ${game.mainCount} main number${game.mainCount > 1 ? 's' : ''}${hasBonus ? ` and ${game.bonusCount} ${game.bonusLabel.toLowerCase()}` : ''}.</p>
     `;
+    updateResultsVisibility(currentFeature);
     scrollToResultBox(historyResultsBox);
     return;
   }
@@ -4280,6 +4281,7 @@ function renderDashboardResults(opts) {
       <h3>Date of birth needed</h3>
       <p class="muted">Please enter a date of birth so the app can work out when you turned 18.</p>
     `;
+    updateResultsVisibility(currentFeature);
     scrollToResultBox(historyResultsBox);
     return;
   }
@@ -4352,6 +4354,7 @@ function renderDashboardResults(opts) {
     closestLabel: formatResultLabel(currentGame, closestMain, closestBonus),
     breakdownRows
   });
+  updateResultsVisibility(currentFeature);
   scrollToResultBox(historyResultsBox);
   updateResultsBackTopVisibility();
 }
