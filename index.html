@@ -523,6 +523,23 @@
       flex: 1 1 140px;
     }
 
+    .bulk-history-actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .bulk-history-actions button {
+      width: 100%;
+      min-height: 46px;
+    }
+
+    .bulk-history-actions .invisible {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
     .muted {
       color: var(--muted);
     }
@@ -3516,12 +3533,13 @@ function pickFromPool(pool, count) {
       const atLatest = challengeResultIndex >= challengeResultHistory.length - 1;
       const canGoPrevious = challengeResultIndex > 0;
       const canGoNext = challengeResultIndex < challengeResultHistory.length - 1;
+      const rightButtonLabel = canGoNext ? 'Next Result' : '↻ Replay';
+      const rightButtonId = canGoNext ? 'bulkNextResultBtn' : 'bulkReplayBtn';
 
       return `
-        <div class="check-actions" style="margin-top:14px;">
-          ${canGoPrevious ? '<button id="bulkPreviousResultBtn" type="button">Previous Result</button>' : ''}
-          ${canGoNext ? '<button class="primary" id="bulkNextResultBtn" type="button">Next Result</button>' : ''}
-          ${atLatest ? '<button class="primary" id="bulkReplayBtn" type="button">↻ Replay</button>' : ''}
+        <div class="check-actions bulk-history-actions" style="margin-top:14px;">
+          <button id="bulkPreviousResultBtn" class="bulk-previous-slot${canGoPrevious ? '' : ' invisible'}" type="button" ${canGoPrevious ? '' : 'tabindex="-1" aria-hidden="true"'}>Previous Result</button>
+          <button class="primary bulk-replay-slot" id="${rightButtonId}" type="button">${rightButtonLabel}</button>
         </div>
       `;
     }
