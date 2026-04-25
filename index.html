@@ -3072,6 +3072,8 @@ async function loadSetForLifeData() {
     }
 
     function getPrizeTable(gameKey = currentGame) {
+      // Approximate top-prize placeholders are used where prize values vary by draw/jackpot.
+      // The key format is main matches + bonus/special-ball matches where applicable.
       return gameKey === 'lotto'
         ? { '3': 30, '4': 140, '5': 1750, '6': 1000000 }
         : gameKey === 'euromillions'
@@ -3090,8 +3092,39 @@ async function loadSetForLifeData() {
               '5+2': 1000000
             }
           : gameKey === 'thunderball'
-            ? { '2': 3, '3': 10, '4': 120, '5': 5000 }
-            : { '2': 5, '3': 20, '4': 250, '5': 10000 };
+            ? {
+                '0+1': 3,
+                '1+1': 5,
+                '2+0': 3,
+                '2+1': 10,
+                '3+0': 10,
+                '3+1': 20,
+                '4+0': 100,
+                '4+1': 250,
+                '5+0': 5000,
+                '5+1': 500000
+              }
+            : {
+                '2+0': 5,
+                '2+1': 10,
+                '3+0': 20,
+                '3+1': 30,
+                '4+0': 250,
+                '4+1': 500,
+                '5+0': 10000,
+                '5+1': 10000
+              };
+    }
+
+    function gameUsesBonusInResults(gameKey) {
+      return ['euromillions', 'thunderball', 'setforlife'].includes(gameKey);
+    }
+
+    function getBonusResultWord(gameKey, bonusMatches = 0) {
+      if (gameKey === 'euromillions') return bonusMatches === 1 ? 'star' : 'stars';
+      if (gameKey === 'thunderball') return 'Thunderball';
+      if (gameKey === 'setforlife') return 'Life Ball';
+      return bonusMatches === 1 ? 'bonus' : 'bonuses';
     }
 
     function getResultKey(gameKey, mainMatches, bonusMatches = 0) {
@@ -3099,7 +3132,21 @@ async function loadSetForLifeData() {
         if (mainMatches < 2) return null;
         return `${mainMatches}+${bonusMatches}`;
       }
-      return mainMatches >= 2 ? String(mainMatches) : null;
+
+      if (gameKey === 'thunderball') {
+        // Thunderball pays for Thunderball-only hits as well as main-number tiers.
+        if (mainMatches === 0 && bonusMatches === 1) return '0+1';
+        if (mainMatches === 1 && bonusMatches === 1) return '1+1';
+        if (mainMatches >= 2) return `${mainMatches}+${bonusMatches}`;
+        return null;
+      }
+
+      if (gameKey === 'setforlife') {
+        if (mainMatches >= 2) return `${mainMatches}+${bonusMatches}`;
+        return null;
+      }
+
+      return mainMatches >= 3 ? String(mainMatches) : null;
     }
 
     function getPrizeForMatches(gameKey, mainMatches, bonusMatches = 0) {
@@ -3110,27 +3157,53 @@ async function loadSetForLifeData() {
 
     function getResultRank(gameKey, mainMatches, bonusMatches = 0) {
       if (gameKey === 'euromillions') return (mainMatches * 10) + bonusMatches;
+      if (gameKey === 'thunderball') return (mainMatches * 10) + bonusMatches;
+      if (gameKey === 'setforlife') return (mainMatches * 10) + bonusMatches;
       return mainMatches;
     }
 
     function formatResultLabel(gameKey, mainMatches, bonusMatches = 0) {
-      if (!mainMatches) return '—';
       if (gameKey === 'euromillions') {
-        const starWord = bonusMatches === 1 ? 'star' : 'stars';
-        return `${mainMatches} + ${bonusMatches} ${starWord}`;
+        if (!mainMatches) return bonusMatches ? `${bonusMatches} ${getBonusResultWord(gameKey, bonusMatches)}` : '—';
+        return `${mainMatches} main + ${bonusMatches} ${getBonusResultWord(gameKey, bonusMatches)}`;
       }
+
+      if (gameKey === 'thunderball') {
+        if (!mainMatches && bonusMatches) return 'Thunderball only';
+        if (!mainMatches) return '—';
+        return `${mainMatches} main${bonusMatches ? ' + Thunderball' : ''}`;
+      }
+
+      if (gameKey === 'setforlife') {
+        if (!mainMatches) return '—';
+        return `${mainMatches} main${bonusMatches ? ' + Life Ball' : ''}`;
+      }
+
+      if (!mainMatches) return '—';
       return `${mainMatches} main match${mainMatches > 1 ? 'es' : ''}`;
     }
 
     function renderBreakdownRowsForGame(gameKey, buckets, game) {
-      if (gameKey === 'euromillions') {
+      if (gameUsesBonusInResults(gameKey)) {
         const rows = [];
-        for (let main = game.mainCount; main >= 2; main--) {
+        const minMain = gameKey === 'thunderball' ? 0 : 2;
+
+        for (let main = game.mainCount; main >= minMain; main--) {
           for (let bonus = game.bonusCount; bonus >= 0; bonus--) {
             const key = `${main}+${bonus}`;
-            const label = bonus === 0
-              ? `${main} main`
-              : `${main} main + ${bonus} ${bonus === 1 ? 'star' : 'stars'}`;
+            if (!getResultKey(gameKey, main, bonus)) continue;
+
+            let label = '';
+            if (gameKey === 'thunderball' && main === 0 && bonus === 1) {
+              label = 'Thunderball only';
+            } else if (gameKey === 'thunderball' && main === 1 && bonus === 1) {
+              label = '1 main + Thunderball';
+            } else if (bonus === 0) {
+              label = `${main} main`;
+            } else {
+              label = `${main} main + ${gameKey === 'euromillions' ? `${bonus} ${getBonusResultWord(gameKey, bonus)}` : getBonusResultWord(gameKey, bonus)}`;
+            }
+
             rows.push(`<div class="stats-row"><span>${label}</span><strong>${(buckets[key] || 0).toLocaleString()}</strong></div>`);
           }
         }
@@ -3138,7 +3211,7 @@ async function loadSetForLifeData() {
       }
 
       const rows = [];
-      for (let i = game.mainCount; i >= 2; i--) {
+      for (let i = game.mainCount; i >= 3; i--) {
         rows.push(`<div class="stats-row"><span>${i} main match${i > 1 ? 'es' : ''}</span><strong>${(buckets[String(i)] || 0).toLocaleString()}</strong></div>`);
       }
       return rows.join('');
