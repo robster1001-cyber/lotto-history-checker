@@ -2994,37 +2994,20 @@
     const soundToggleBtn = document.getElementById('soundToggleBtn');
     let soundEnabled = localStorage.getItem('lottoSoundEnabled') !== 'false';
     let soundCtx = null;
-    let soundUnlocked = false;
 
     function getSoundContext() {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return null;
-      if (!soundCtx) soundCtx = new AudioContextClass();
+      if (!soundCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        soundCtx = new AudioContextClass();
+      }
+      if (soundCtx.state === 'suspended') soundCtx.resume().catch(() => {});
       return soundCtx;
     }
 
-    function unlockSound() {
-      const ctx = getSoundContext();
-      if (!ctx) return null;
-      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
-
-      if (!soundUnlocked) {
-        const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
-        const source = ctx.createBufferSource();
-        const gain = ctx.createGain();
-        gain.gain.value = 0.0001;
-        source.buffer = buffer;
-        source.connect(gain);
-        gain.connect(ctx.destination);
-        try { source.start(0); } catch (e) {}
-        soundUnlocked = true;
-      }
-      return ctx;
-    }
-
-    function playTone({ frequency = 220, duration = 0.08, type = 'sine', gain = 0.07, slideTo = null, delay = 0 }) {
+    function playTone({ frequency = 220, duration = 0.08, type = 'sine', gain = 0.035, slideTo = null, delay = 0 }) {
       if (!soundEnabled) return;
-      const ctx = unlockSound();
+      const ctx = getSoundContext();
       if (!ctx) return;
       const start = ctx.currentTime + delay;
       const osc = ctx.createOscillator();
@@ -3033,17 +3016,17 @@
       osc.frequency.setValueAtTime(frequency, start);
       if (slideTo) osc.frequency.exponentialRampToValueAtTime(Math.max(1, slideTo), start + duration);
       vol.gain.setValueAtTime(0.0001, start);
-      vol.gain.exponentialRampToValueAtTime(gain, start + 0.01);
+      vol.gain.exponentialRampToValueAtTime(gain, start + 0.012);
       vol.gain.exponentialRampToValueAtTime(0.0001, start + duration);
       osc.connect(vol);
       vol.connect(ctx.destination);
       osc.start(start);
-      osc.stop(start + duration + 0.03);
+      osc.stop(start + duration + 0.02);
     }
 
-    function playNoise({ duration = 0.09, gain = 0.07, lowpass = 420, delay = 0 }) {
+    function playNoise({ duration = 0.09, gain = 0.035, lowpass = 420, delay = 0 }) {
       if (!soundEnabled) return;
-      const ctx = unlockSound();
+      const ctx = getSoundContext();
       if (!ctx) return;
       const start = ctx.currentTime + delay;
       const bufferSize = Math.max(1, Math.floor(ctx.sampleRate * duration));
@@ -3062,28 +3045,28 @@
       filter.connect(vol);
       vol.connect(ctx.destination);
       source.start(start);
-      source.stop(start + duration + 0.03);
+      source.stop(start + duration + 0.02);
     }
 
     function playAppSound(name) {
       if (!soundEnabled) return;
       if (name === 'tap') {
-        playTone({ frequency: 620, duration: 0.045, type: 'sine', gain: 0.045, slideTo: 760 });
+        playTone({ frequency: 520, duration: 0.035, type: 'sine', gain: 0.018, slideTo: 620 });
       } else if (name === 'thud') {
-        playNoise({ duration: 0.16, gain: 0.12, lowpass: 260 });
-        playTone({ frequency: 105, duration: 0.16, type: 'triangle', gain: 0.09, slideTo: 45 });
+        playNoise({ duration: 0.12, gain: 0.055, lowpass: 240 });
+        playTone({ frequency: 94, duration: 0.13, type: 'triangle', gain: 0.04, slideTo: 48 });
       } else if (name === 'win') {
-        playTone({ frequency: 660, duration: 0.09, type: 'sine', gain: 0.075 });
-        playTone({ frequency: 880, duration: 0.11, type: 'sine', gain: 0.065, delay: 0.075 });
-        playTone({ frequency: 1180, duration: 0.13, type: 'sine', gain: 0.055, delay: 0.16 });
+        playTone({ frequency: 660, duration: 0.08, type: 'sine', gain: 0.035 });
+        playTone({ frequency: 880, duration: 0.10, type: 'sine', gain: 0.03, delay: 0.07 });
+        playTone({ frequency: 1180, duration: 0.12, type: 'sine', gain: 0.025, delay: 0.15 });
       } else if (name === 'lose') {
-        playTone({ frequency: 240, duration: 0.12, type: 'triangle', gain: 0.065, slideTo: 155 });
-        playTone({ frequency: 155, duration: 0.14, type: 'triangle', gain: 0.052, slideTo: 105, delay: 0.08 });
+        playTone({ frequency: 220, duration: 0.10, type: 'triangle', gain: 0.028, slideTo: 155 });
+        playTone({ frequency: 155, duration: 0.12, type: 'triangle', gain: 0.022, slideTo: 120, delay: 0.08 });
       } else if (name === 'replay') {
-        playNoise({ duration: 0.07, gain: 0.06, lowpass: 900 });
-        playTone({ frequency: 410, duration: 0.065, type: 'sine', gain: 0.045, slideTo: 650, delay: 0.035 });
+        playNoise({ duration: 0.06, gain: 0.025, lowpass: 900 });
+        playTone({ frequency: 410, duration: 0.055, type: 'sine', gain: 0.018, slideTo: 620, delay: 0.03 });
       } else if (name === 'clear') {
-        playTone({ frequency: 360, duration: 0.07, type: 'sine', gain: 0.05, slideTo: 210 });
+        playTone({ frequency: 330, duration: 0.055, type: 'sine', gain: 0.02, slideTo: 220 });
       }
     }
 
@@ -3099,19 +3082,12 @@
       syncSoundToggle();
       soundToggleBtn.addEventListener('click', (event) => {
         event.preventDefault();
-        unlockSound();
         soundEnabled = !soundEnabled;
         localStorage.setItem('lottoSoundEnabled', soundEnabled ? 'true' : 'false');
         syncSoundToggle();
-        if (soundEnabled) setTimeout(() => playAppSound('win'), 20);
+        if (soundEnabled) playAppSound('tap');
       });
     }
-
-    ['pointerdown', 'touchstart', 'click', 'keydown'].forEach(eventName => {
-      document.addEventListener(eventName, () => {
-        if (soundEnabled) unlockSound();
-      }, { once: true, passive: true });
-    });
 
     document.addEventListener('pointerdown', (event) => {
       const target = event.target.closest('button, .number-btn, .feature-card, summary');
