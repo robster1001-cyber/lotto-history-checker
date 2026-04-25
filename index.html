@@ -3288,6 +3288,8 @@ async function loadSetForLifeData() {
     let challengeGameChosen = false;
     let pickerGameChosen = false;
     let ticketGameChosen = false;
+    let challengeResultHistory = [];
+    let challengeResultIndex = -1;
 
     const mainGrid = document.getElementById('mainGrid');
     const bonusGrid = document.getElementById('bonusGrid');
@@ -3499,12 +3501,51 @@ function pickFromPool(pool, count) {
 }
 
     function resetChallengeBox() {
+  challengeResultHistory = [];
+  challengeResultIndex = -1;
   challengeResultsBox.innerHTML = '';
   challengeResultsBox.classList.add('hidden');
   setChallengeResultsDimmed(false);
   updateResultsVisibility(currentFeature);
   updateResultsBackTopVisibility();
 }
+
+    function getChallengeHistoryNavHtml() {
+      if (!challengeResultHistory.length) return '';
+
+      const atLatest = challengeResultIndex >= challengeResultHistory.length - 1;
+      const canGoPrevious = challengeResultIndex > 0;
+      const canGoNext = challengeResultIndex < challengeResultHistory.length - 1;
+
+      return `
+        <div class="check-actions" style="margin-top:14px;">
+          ${canGoPrevious ? '<button id="bulkPreviousResultBtn" type="button">Previous Result</button>' : ''}
+          ${canGoNext ? '<button class="primary" id="bulkNextResultBtn" type="button">Next Result</button>' : ''}
+          ${atLatest ? '<button class="primary" id="bulkReplayBtn" type="button">↻ Replay</button>' : ''}
+        </div>
+      `;
+    }
+
+    function renderChallengeHistoryEntry(index, shouldScroll = true) {
+      if (!challengeResultHistory.length) return;
+      const safeIndex = Math.max(0, Math.min(index, challengeResultHistory.length - 1));
+      challengeResultIndex = safeIndex;
+      challengeResultsBox.innerHTML = challengeResultHistory[safeIndex].html + getChallengeHistoryNavHtml();
+      setChallengeResultsDimmed(false);
+      updateResultsVisibility('challenge');
+      if (shouldScroll) {
+        scrollToResultBox(challengeResultsBox);
+      }
+      updateResultsBackTopVisibility();
+    }
+
+    function storeChallengeResult(html) {
+      if (challengeResultIndex < challengeResultHistory.length - 1) {
+        challengeResultHistory = challengeResultHistory.slice(0, challengeResultIndex + 1);
+      }
+      challengeResultHistory.push({ html });
+      renderChallengeHistoryEntry(challengeResultHistory.length - 1, true);
+    }
 
     function resetPickerBox() {
   pickerResultsBox.innerHTML = '';
@@ -4751,7 +4792,7 @@ function runPickerCheck() {
         : '<div class="picked-line empty">—</div>')
     : '';
 
-  challengeResultsBox.innerHTML = `
+  const challengeResultHtml = `
     <div class="kicker">Bulk Buy result</div>
     <div class="bulk-head">
       <div class="bulk-head-copy">
@@ -4829,16 +4870,11 @@ function runPickerCheck() {
         </div>
       </details>
 
-      <div class="check-actions" style="margin-top:14px;">
-        <button class="primary" id="bulkReplayBtn" type="button">↻ Replay</button>
-      </div>
     </div>
   `;
   setChallengeResultsDimmed(false);
   hideChallengeRunStatus('Done. That hurt.');
-  updateResultsVisibility('challenge');
-  scrollToResultBox(challengeResultsBox);
-  updateResultsBackTopVisibility();
+  storeChallengeResult(challengeResultHtml);
 }
 
 function clearSelections() {
@@ -5293,9 +5329,23 @@ function clearSelections() {
     }
 
     challengeResultsBox.addEventListener('click', (event) => {
+      const previousBtn = event.target.closest('#bulkPreviousResultBtn');
+      const nextBtn = event.target.closest('#bulkNextResultBtn');
       const replayBtn = event.target.closest('#bulkReplayBtn');
-      if (!replayBtn) return;
-      runChallenge();
+
+      if (previousBtn) {
+        renderChallengeHistoryEntry(challengeResultIndex - 1, true);
+        return;
+      }
+
+      if (nextBtn) {
+        renderChallengeHistoryEntry(challengeResultIndex + 1, true);
+        return;
+      }
+
+      if (replayBtn) {
+        runChallenge();
+      }
     });
 
     window.addEventListener('scroll', updateTopResetVisibility, { passive: true });
