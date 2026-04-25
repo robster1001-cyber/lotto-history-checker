@@ -4389,19 +4389,41 @@ function renderDashboardResults(opts) {
   `;
 }
 
+function scrollToIncompleteNumberGrid() {
+  const game = games[currentGame];
+  const hasBonus = game && game.bonusCount > 0;
+  const missingMain = !game || selectedMain.length !== game.mainCount;
+  const missingBonus = hasBonus && selectedBonus.length !== game.bonusCount;
+
+  resetHistoryBox();
+
+  if (missingMain && mainGrid) {
+    triggerGoldReveal(mainGrid);
+  }
+
+  if (missingBonus && bonusGrid) {
+    triggerGoldReveal(bonusGrid);
+  }
+
+  const target = missingMain
+    ? (mainTitle ? mainTitle.closest(".subsection") : mainGrid)
+    : (document.getElementById("bonusSection") || bonusGrid);
+
+  if (target) {
+    setTimeout(() => {
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 60);
+  }
+}
+
+
     function checkHistory() {
   setHistoryResultsDimmed(false);
   const game = games[currentGame];
   const hasBonus = game.bonusCount > 0;
 
   if (selectedMain.length !== game.mainCount || (hasBonus && selectedBonus.length !== game.bonusCount)) {
-    historyResultsBox.innerHTML = `
-      <div class="kicker">History result</div>
-      <h3>Line incomplete</h3>
-      <p class="muted">Please select ${game.mainCount} main number${game.mainCount > 1 ? 's' : ''}${hasBonus ? ` and ${game.bonusCount} ${game.bonusLabel.toLowerCase()}` : ''}.</p>
-    `;
-    updateResultsVisibility(currentFeature);
-    scrollToResultBox(historyResultsBox);
+    scrollToIncompleteNumberGrid();
     return;
   }
 
