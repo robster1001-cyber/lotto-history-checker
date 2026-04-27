@@ -5149,7 +5149,7 @@ function runPickerCheck() {
   `;
   setChallengeResultsDimmed(false);
   hideChallengeRunStatus('Done. That hurt.');
-  playAppSound(profitLoss >= 0 ? 'win' : 'lose');
+  if (profitLoss >= 0) playAppSound('win');
   storeChallengeResult(challengeResultHtml);
 }
 
