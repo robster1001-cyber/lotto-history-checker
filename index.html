@@ -1300,6 +1300,57 @@
   margin-bottom: 0;
 }
 
+.draw-history-intro {
+  margin-bottom: 14px;
+}
+
+.draw-history-intro h3 {
+  max-width: 760px;
+  line-height: 1.35;
+}
+
+.draw-game-shell {
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.draw-game-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.draw-game-grid button {
+  min-height: 96px;
+  border-radius: 18px;
+  font-size: 0.98rem;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.draw-game-grid button.active {
+  background: linear-gradient(180deg, rgba(242,201,76,0.95), rgba(212,169,50,0.95));
+  color: #1f2937;
+  border-color: rgba(242,201,76,0.7);
+}
+
+.draw-history-selected {
+  margin-top: 4px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 760px) {
+  .draw-game-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .draw-game-grid button {
+    min-height: 82px;
+  }
+}
+
 
 @media (max-width: 620px) {
   .check-actions {
@@ -2924,14 +2975,13 @@
         </div>
 
         <div id="ticketSection" class="hidden">
-          <div class="info-box">
-            <div class="kicker">Pick your draw archive</div>
-            <h3>Choose a game to begin</h3>
+          <div class="info-box draw-history-intro">
+            <div class="kicker">Draw History</div>
+            <h3>Browse UK Lotto, EuroMillions, Thunderball and Set For Life results by year.</h3>
           </div>
 
-          <div class="button-group-shell">
-            <div class="section-label">Lottery game</div>
-            <div class="game-row" id="ticketGameRow">
+          <div class="button-group-shell draw-game-shell">
+            <div class="game-row draw-game-grid" id="ticketGameRow">
               <button type="button" data-ticket-game="lotto">UK Lotto</button>
               <button type="button" data-ticket-game="euromillions">EuroMillions</button>
               <button type="button" data-ticket-game="thunderball">Thunderball</button>
@@ -2939,10 +2989,8 @@
             </div>
           </div>
 
-          <div class="info-box ticket-history-hidden" id="ticketHistoryIntroBox">
-            <div class="kicker">Winning numbers</div>
+          <div class="info-box ticket-history-hidden draw-history-selected" id="ticketHistoryIntroBox">
             <h3 id="ticketHistoryTitle">UK Lotto draw history</h3>
-            <p class="muted" id="ticketHistorySubtitle">Browse the real draws year by year.</p>
           </div>
 
           <div class="draw-history-wrap ticket-history-hidden" id="drawHistoryBox"></div>
