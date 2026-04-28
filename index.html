@@ -4963,7 +4963,6 @@ function runPickerCheck() {
     }
 
     async function runChallenge() {
-  playAppSound('check');
 
   if (!challengeGameChosen) {
     challengeResultsBox.innerHTML = `
@@ -5573,7 +5572,10 @@ function clearSelections() {
       }
     });
 
-    document.getElementById('runChallengeBtn').addEventListener('click', runChallenge);
+    document.getElementById('runChallengeBtn').addEventListener('click', () => {
+      playAppSound('check');
+      runChallenge();
+    });
     document.getElementById('clearChallengeBtn').addEventListener('click', clearChallengeSelections);
 
 
@@ -5622,6 +5624,7 @@ function clearSelections() {
       }
 
       if (replayBtn) {
+        playAppSound('check');
         runChallenge();
       }
     });
