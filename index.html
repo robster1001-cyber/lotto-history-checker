@@ -2976,6 +2976,183 @@
       }
     }
 
+
+
+    /* Launch-ready footer + subtle ad zones */
+    .ad-slot {
+      width: 100%;
+      margin: 18px 0;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(15, 23, 42, 0.48);
+      border: 1px dashed rgba(148, 163, 184, 0.22);
+      color: rgba(148, 163, 184, 0.72);
+      text-align: center;
+      font-size: 0.78rem;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+    }
+
+    .ad-slot.ad-home {
+      margin: 4px 0 18px;
+    }
+
+    .ad-slot.ad-results {
+      margin-top: 16px;
+    }
+
+    .ad-slot span {
+      opacity: 0.75;
+    }
+
+    .site-footer {
+      margin-top: 26px;
+      padding: 24px 18px 26px;
+      border-radius: 22px 22px 0 0;
+      background:
+        radial-gradient(circle at top left, rgba(96,165,250,0.18), transparent 34%),
+        linear-gradient(180deg, rgba(15, 23, 42, 0.98) 0%, rgba(8, 13, 26, 0.98) 100%);
+      border-top: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 -14px 34px rgba(0,0,0,0.18);
+      text-align: center;
+      color: var(--muted);
+    }
+
+    .site-footer-brand {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      color: #ffffff;
+      font-size: 1.08rem;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+    }
+
+    .site-footer-brand-balls {
+      display: inline-flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .site-footer-brand-balls i {
+      width: 11px;
+      height: 11px;
+      border-radius: 999px;
+      display: block;
+      box-shadow: 0 0 10px rgba(242,201,76,0.22);
+    }
+
+    .site-footer-brand-balls i:nth-child(1) { background: #f2c94c; }
+    .site-footer-brand-balls i:nth-child(2) { background: #60a5fa; }
+    .site-footer-brand-balls i:nth-child(3) { background: #f87171; }
+
+    .site-footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 0;
+      margin: 0 auto 14px;
+      max-width: 760px;
+      font-size: 0.82rem;
+      line-height: 1.2;
+    }
+
+    .site-footer-links a,
+    .site-footer-links button {
+      color: #dbeafe;
+      background: none;
+      border: none;
+      padding: 0 12px;
+      border-radius: 0;
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
+      border-right: 1px solid rgba(255,255,255,0.18);
+      cursor: pointer;
+    }
+
+    .site-footer-links a:last-child,
+    .site-footer-links button:last-child {
+      border-right: none;
+    }
+
+    .site-footer-links a:hover,
+    .site-footer-links button:hover {
+      color: #ffffff;
+      transform: none;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    .responsible-note {
+      margin: 0 auto 8px;
+      color: #ffffff;
+      font-size: 1.05rem;
+      font-weight: 900;
+      line-height: 1.25;
+    }
+
+    .responsible-note span {
+      color: var(--gold);
+    }
+
+    .site-footer-small {
+      max-width: 860px;
+      margin: 0 auto;
+      color: rgba(203,213,225,0.82);
+      font-size: 0.76rem;
+      line-height: 1.45;
+    }
+
+    .site-footer-small + .site-footer-small {
+      margin-top: 6px;
+    }
+
+    .site-footer-meta {
+      margin-top: 12px;
+      color: rgba(148,163,184,0.76);
+      font-size: 0.72rem;
+    }
+
+    @media (max-width: 620px) {
+      .ad-slot {
+        margin: 14px 0;
+        padding: 12px 14px;
+        border-radius: 14px;
+        font-size: 0.72rem;
+      }
+
+      .site-footer {
+        margin-top: 20px;
+        padding: 22px 12px 24px;
+        border-radius: 18px 18px 0 0;
+      }
+
+      .site-footer-brand {
+        font-size: 1rem;
+      }
+
+      .site-footer-links {
+        gap: 8px 0;
+        font-size: 0.78rem;
+      }
+
+      .site-footer-links a,
+      .site-footer-links button {
+        padding: 0 9px;
+      }
+
+      .responsible-note {
+        font-size: 0.98rem;
+      }
+
+      .site-footer-small {
+        font-size: 0.72rem;
+      }
+    }
+
 </style>
 </head>
 <body>
@@ -2989,9 +3166,6 @@
         </div>
       </div>
     </section>
-
-    <div class="ad-slot home-entry home-ad-slot" id="homeTopAdSlot" aria-label="Advertisement space">
-      <div>Advert space reserved<small>Future sponsor / banner area</small></div>
     </div>
 
 
@@ -3033,6 +3207,11 @@
         <button class="home-card-help-close" id="homeCardHelpClose" type="button" aria-label="Close help">Done</button>
       </div>
       <div id="homeCardHelpBody">Tap a question mark to see what that tab does.</div>
+    </div>
+
+
+    <div class="home-entry ad-slot ad-home" aria-label="Advertising space">
+      <span>Advert space</span>
     </div>
 
     <div class="home-entry home-footer-note" id="homeFooterNote">
@@ -3265,35 +3444,40 @@
         <div class="result-box hidden" id="historyResultsBox"></div>
         <div class="result-box hidden" id="pickerResultsBox"></div>
         <div class="result-box hidden" id="challengeResultsBox"></div>
+        </div>
 
-        <div class="ad-slot workspace-ad-slot" id="resultsAdSlot" aria-label="Advertisement space">
-          <div>Advert space reserved<small>Future result-page sponsor area</small></div>
+
+        <div class="ad-slot ad-results" aria-label="Advertising space">
+          <span>Advert space</span>
         </div>
 
         <button class="results-back-top hidden" id="resultsBackTopBtn" type="button">↑ Top</button>
 </div>
     </section>
-  
 
-    <footer class="site-footer" id="siteFooter">
-      <div class="site-footer-card">
-        <div class="site-footer-grid">
-          <div>
-            <h4>Lotto History Checker</h4>
-            <p>Built for entertainment and historical number checking. It does not predict future results, improve your odds, or provide gambling advice.</p>
-            <p>Results are based on historical draw data loaded into this app. Please check official lottery sources before relying on any result or prize information.</p>
-          </div>
-          <div class="footer-links" aria-label="Footer links">
-            <span>Contact / ads: add email</span>
-            <span>Privacy policy: coming soon</span>
-            <span>Terms: coming soon</span>
-          </div>
-        </div>
-        <div class="footer-smallprint">
-          This site is independently developed and is not affiliated with, endorsed by, or connected to The National Lottery, Allwyn, Camelot, EuroMillions or any official lottery operator. Play responsibly. 18+ only.
-        </div>
+    <footer class="site-footer">
+      <div class="site-footer-brand">
+        <span class="site-footer-brand-balls" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>Lotto History Checker</span>
       </div>
+
+      <nav class="site-footer-links" aria-label="Footer links">
+        <a href="mailto:hello@lottohistorychecker.co.uk">Contact</a>
+        <button type="button" onclick="alert('Privacy policy coming soon. No account required and no personal lottery lines are stored by this prototype.')">Privacy Policy</button>
+        <button type="button" onclick="alert('This site is for entertainment and information only. It does not sell lottery tickets or guarantee outcomes.')">Disclaimer</button>
+        <button type="button" onclick="alert('Cookie notice coming soon. Keep it simple, keep it honest.')">Cookie Policy</button>
+      </nav>
+
+      <p class="responsible-note"><span>18+</span> Play responsibly.</p>
+      <p class="site-footer-small">
+        This site is independently developed and is not affiliated with, endorsed by, or connected to any official lottery operator.
+      </p>
+      <p class="site-footer-small">
+        Results are based on publicly available historical draw data and are provided for entertainment and general information only.
+      </p>
+      <div class="site-footer-meta">© 2026 Lotto History Checker</div>
     </footer>
+
   </div>
 
   
