@@ -3153,10 +3153,135 @@
       }
     }
 
-</style>
+
+
+    /* Desktop-centred layout with future ad rails — mobile stays clean */
+    .page-shell {
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(140px, 1fr) minmax(0, 980px) minmax(140px, 1fr);
+      gap: 24px;
+      padding: 22px 24px 0;
+      align-items: start;
+    }
+
+    .page-shell > .app {
+      grid-column: 2;
+      width: 100%;
+      max-width: none;
+      margin: 0;
+      padding: 0 0 24px;
+      min-height: 100vh;
+    }
+
+    .ad-rail {
+      min-height: 1px;
+      position: sticky;
+      top: 22px;
+    }
+
+    .ad-rail-left { grid-column: 1; }
+    .ad-rail-right { grid-column: 3; }
+
+    .hero {
+      margin: 0 auto 18px !important;
+      width: 100%;
+      max-width: 980px;
+    }
+
+    .hero-art {
+      overflow: hidden;
+      border-radius: 22px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.26);
+    }
+
+    .hero-art img {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: clamp(140px, 18vw, 230px) !important;
+      margin: 0 !important;
+      display: block;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .home-cards {
+      width: 100%;
+      max-width: 980px;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      margin-bottom: 18px !important;
+    }
+
+    .home-entry.ad-home,
+    .home-footer-note,
+    .site-footer,
+    .workspace-shell,
+    .top-reset-btn,
+    .home-card-help-panel {
+      max-width: 980px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+    }
+
+    @media (min-width: 1400px) {
+      .page-shell {
+        grid-template-columns: minmax(180px, 1fr) minmax(0, 1040px) minmax(180px, 1fr);
+      }
+
+      .hero,
+      .home-cards,
+      .home-entry.ad-home,
+      .home-footer-note,
+      .site-footer,
+      .workspace-shell,
+      .top-reset-btn,
+      .home-card-help-panel {
+        max-width: 1040px;
+      }
+    }
+
+    @media (max-width: 1199px) {
+      .page-shell {
+        display: block;
+        padding: 16px;
+      }
+
+      .page-shell > .app {
+        padding: 0;
+      }
+
+      .ad-rail {
+        display: none;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .page-shell {
+        padding: 16px;
+      }
+
+      .hero-art {
+        border-radius: 18px;
+      }
+
+      .hero-art img {
+        height: auto !important;
+        width: 100% !important;
+        margin: 0 !important;
+      }
+    }
+
+  </style>
 </head>
 <body>
-  <div class="app">
+  <div class="page-shell">
+    <aside class="ad-rail ad-rail-left" aria-hidden="true"></aside>
+
+    <div class="app">
     
     
     <section class="hero">
@@ -3166,12 +3291,7 @@
         </div>
       </div>
     </section>
-    </div>
 
-
-
-
-    
     <button class="top-reset-btn hidden" id="topResetBtn" type="button">Reset</button>
 
     <section class="home-cards home-entry" id="homeCardsSection">
@@ -3478,9 +3598,10 @@
       <div class="site-footer-meta">© 2026 Lotto History Checker</div>
     </footer>
 
-  </div>
+    </div>
 
-  
+    <aside class="ad-rail ad-rail-right" aria-hidden="true"></aside>
+  </div>
 
   <div class="picker-reveal-overlay hidden" id="pickerRevealOverlay" aria-hidden="true">
     <div class="picker-reveal-card reveal-lucky">
