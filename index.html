@@ -2796,6 +2796,47 @@
       }
     }
 
+
+
+    /* Simplified picker reveal cards: category + one random phrase only */
+    .picker-reveal-kicker,
+    .picker-reveal-text,
+    .picker-personality-title,
+    .picker-personality-copy {
+      display: none !important;
+    }
+
+    .picker-reveal-title {
+      margin-bottom: 14px !important;
+      font-size: clamp(1.05rem, 3.4vw, 1.35rem) !important;
+      letter-spacing: 0.14em !important;
+      color: var(--muted) !important;
+      text-transform: uppercase !important;
+      text-shadow: none !important;
+    }
+
+    .picker-reveal-pill.picker-simple-phrase {
+      display: flex !important;
+      justify-content: center !important;
+      width: 100% !important;
+      margin: 0 auto !important;
+      padding: 14px 16px !important;
+      border-radius: 18px !important;
+      font-size: clamp(1.55rem, 6vw, 2.35rem) !important;
+      line-height: 1.08 !important;
+      text-align: center !important;
+      letter-spacing: -0.02em !important;
+    }
+
+    #pickerVerdictPill.picker-simple-phrase {
+      display: block !important;
+      font-size: clamp(1.25rem, 4vw, 1.75rem) !important;
+      line-height: 1.12 !important;
+      margin-top: 2px !important;
+      margin-bottom: 0 !important;
+    }
+
+
 </style>
 </head>
 <body>
@@ -2975,7 +3016,7 @@
           <div class="button-group-shell picker-reveal-hidden" id="pickerControlsWrap">
             <div class="section-label">Play style</div>
             <div class="btn-row picker-style-row">
-              <button id="pickerLuckyBtn" class="picker-style-btn"><span class="label-text">Lucky Pick</span><span class="mode-help" data-style="lucky" data-title="Lucky Pick" data-tip="A proper no-nonsense random line. Great if you just want the machine to choose and crack on." role="button" tabindex="0" aria-label="Explain Lucky Pick">?</span></button>
+              <button id="pickerLuckyBtn" class="picker-style-btn"><span class="label-text">Random</span><span class="mode-help" data-style="lucky" data-title="Random" data-tip="A fully random line. No heat maps, no theories, just pure number chaos in a tidy shirt." role="button" tabindex="0" aria-label="Explain Random">?</span></button>
               <button id="pickerHotBtn" class="picker-style-btn"><span class="label-text">Hot Pick</span><span class="mode-help" data-style="hot" data-title="Hot Pick" data-tip="Leans into the historically common numbers, for when you fancy pretending recent heat means something." role="button" tabindex="0" aria-label="Explain Hot Pick">?</span></button>
               <button id="pickerColdBtn" class="picker-style-btn"><span class="label-text">Cold Pick</span><span class="mode-help" data-style="cold" data-title="Cold Pick" data-tip="Backs the neglected weirdos — the rarer numbers that have not shown up as often over the years." role="button" tabindex="0" aria-label="Explain Cold Pick">?</span></button>
               <button id="pickerOverdueBtn" class="picker-style-btn"><span class="label-text">Overdue Pick</span><span class="mode-help" data-style="overdue" data-title="Overdue Pick" data-tip="Chases numbers that have gone the longest without appearing. Peak gambler logic. Great fun." role="button" tabindex="0" aria-label="Explain Overdue Pick">?</span></button>
@@ -2986,9 +3027,9 @@
 
           <div class="picker-post-style hidden" id="pickerPostStyleArea">
             <div class="subsection picker-personality-sticky">
-              <h4>Line personality</h4>
-              <div class="tier-pill mid dim" id="pickerVerdictPill">⏳ No rush, mate...</div>
-              <p class="muted" id="pickerVerdictText">Pick a style when you are ready. Then see if you would actually trust the weird little line it gives you.</p>
+              <h4 class="picker-personality-title hidden"></h4>
+              <div class="tier-pill mid dim picker-simple-phrase" id="pickerVerdictPill">Pick a style</div>
+              <p class="muted picker-personality-copy hidden" id="pickerVerdictText"></p>
             </div>
 
             <div class="subsection" id="pickerGeneratedArea">
@@ -3091,10 +3132,10 @@
 
   <div class="picker-reveal-overlay hidden" id="pickerRevealOverlay" aria-hidden="true">
     <div class="picker-reveal-card reveal-lucky">
-      <div class="picker-reveal-kicker">Line personality</div>
-      <h3 class="picker-reveal-title" id="pickerRevealTitle">Lucky Pick</h3>
-      <div class="picker-reveal-pill mid" id="pickerRevealPill">☕ Mr / Mrs Average</div>
-      <p class="picker-reveal-text" id="pickerRevealText">A perfectly average-looking line.</p>
+      <div class="picker-reveal-kicker hidden">Pick style</div>
+      <h3 class="picker-reveal-title" id="pickerRevealTitle">RANDOM</h3>
+      <div class="picker-reveal-pill mid picker-simple-phrase" id="pickerRevealPill">Random Raymondo</div>
+      <p class="picker-reveal-text hidden" id="pickerRevealText"></p>
     </div>
   </div>
 
@@ -3763,10 +3804,24 @@ async function loadSetForLifeData() {
     const ticketHistorySubtitle = document.getElementById('ticketHistorySubtitle');
 
     const verdictPhrases = {
-      smart: ['Smart Pick', 'Einstein Move', 'Proper Boffin', 'Statistically Tasty', 'Brainy Numbers', 'Clever Little Line', 'Wizard Choice', 'Professor Pick', 'Number Ninja', 'Big Brain Energy', 'Lottery Savant', 'Sharp Thinking', 'Clever Clogs', 'Brain Box'],
-      mid: ['Mr / Mrs Average', 'Warm Tea', 'So-So', 'Meh, Could Work', 'Solidly Average', 'Not Bad, Not Brilliant', 'Middle of the Road', 'Safe Bet-ish', 'Steady Eddy', 'Vanilla Numbers', 'Mild Sauce', 'Nothing Fancy', 'Plain Jane Numbers'],
-      cold: ['Not So Smart', 'Bit Dim', 'Damp Squib', 'Snowflake', 'Risky Biscuit', 'Questionable Choices', 'Bit Dodge Mate', 'Bad Scientist', 'Spicy Disaster', 'Lottery Mayhem', 'Numerical Nonsense', 'Wobbly Logic', 'Dubious Pick', 'Bold Strategy']
+      smart: ['Spicy pick'],
+      mid: ['Random Raymondo'],
+      cold: ['Pointless picks']
     };
+
+
+    const pickerPhraseGroups = {
+      hot: ['These will definitely win, maybe.', 'A hot potato', 'Spicy pick', 'Digits unmissable'],
+      cold: ['Damp squiblets', 'Pointless picks', 'Colder than your ex', 'Seriously, why bother?'],
+      overdue: ['Better late than never', 'Recently shy', 'On a gap year', 'Ghosting pro'],
+      chaos: ['Heavy dooty', 'Hold on to your hats', 'Kamikazeeeee', 'Impact heavy'],
+      lucky: ["How's your luck bro", 'A random act of kindness', 'A bit hit or miss', 'Random Raymondo']
+    };
+
+    function getRandomPickerPhrase(mode) {
+      const list = pickerPhraseGroups[mode] || pickerPhraseGroups.lucky;
+      return list[Math.floor(Math.random() * list.length)];
+    }
 
     const impatientPhrases = [
       { pill: '😏 Well go on then…', text: 'Pick something interesting and let the numbers earn their keep.' },
@@ -4132,7 +4187,7 @@ function pickFromPool(pool, count) {
       chaosBtn.classList.toggle('active-game', mode === 'chaos');
 
       const descriptions = {
-        lucky: 'Lucky Pick is your proper no-nonsense random line — ideal if you just want the machine to choose and move on.',
+        lucky: 'Random is a fully random line — no heat maps, no theories, just pure number chaos in a tidy shirt.',
         hot: 'Hot Pick leans into the historically common numbers, for when you fancy pretending recent heat means something.',
         cold: 'Cold Pick backs the neglected weirdos — the rarer numbers that have not shown up as often over the years.',
         overdue: 'Overdue Pick chases numbers that have gone the longest without appearing, which is peak gambler logic and great fun.',
@@ -4357,13 +4412,13 @@ function pickFromPool(pool, count) {
 
     function getPickerModeHeadline(mode) {
       const headlines = {
-        lucky: 'Lucky Pick',
-        hot: 'Hot Pick',
-        cold: 'Cold Pick',
-        overdue: 'Overdue Pick',
-        chaos: 'Chaos Pick'
+        lucky: 'RANDOM',
+        hot: 'HOT',
+        cold: 'COLD',
+        overdue: 'OVERDUE',
+        chaos: 'CHAOS'
       };
-      return headlines[mode] || 'Line personality';
+      return headlines[mode] || 'RANDOM';
     }
 
     function getPickerRevealClass(mode) {
@@ -4387,9 +4442,9 @@ function pickFromPool(pool, count) {
       }
 
       pickerRevealTitle.textContent = getPickerModeHeadline(mode);
-      pickerRevealPill.className = `picker-reveal-pill ${verdict.tier}`;
-      pickerRevealPill.textContent = `${verdict.icon} ${verdict.phrase}`;
-      pickerRevealText.textContent = verdict.explanation;
+      pickerRevealPill.className = `picker-reveal-pill ${verdict.tier} picker-simple-phrase`;
+      pickerRevealPill.textContent = verdict.simplePhrase || getRandomPickerPhrase(mode);
+      pickerRevealText.textContent = '';
 
       pickerRevealOverlay.classList.remove('hidden', 'hiding');
       pickerRevealOverlay.classList.add('show');
@@ -4416,16 +4471,16 @@ function pickFromPool(pool, count) {
       if (!pill || !text) return;
 
       if (!selectedMain.length || strategy === 'manual') {
-        pill.className = 'tier-pill mid dim';
-        pill.textContent = '⏳ No rush, mate...';
-        text.textContent = 'Pick a style when you are ready. Then see if you would actually trust the weird little line it gives you.';
+        pill.className = 'tier-pill mid dim picker-simple-phrase';
+        pill.textContent = 'Pick a style';
+        text.textContent = '';
         return;
       }
 
       const verdict = analyseTicket(selectedMain, strategy);
-      pill.className = `tier-pill ${verdict.tier}`;
-      pill.textContent = `${verdict.icon} ${verdict.phrase}`;
-      text.textContent = verdict.explanation;
+      pill.className = `tier-pill ${verdict.tier} picker-simple-phrase`;
+      pill.textContent = getRandomPickerPhrase(strategy);
+      text.textContent = '';
     }
 
     function renderIntelligence() {
@@ -4981,6 +5036,7 @@ function applyPicker(type) {
   renderIntelligence();
 
   const verdict = analyseTicket(selectedMain, type);
+  verdict.simplePhrase = getRandomPickerPhrase(type);
 
   playAppSound('cards');
 
@@ -4993,9 +5049,8 @@ function applyPicker(type) {
   pickerResultsBox.innerHTML = `
     <div class="kicker">Picker result</div>
     <h3>Generated line ready</h3>
-    <div class="tier-pill ${verdict.tier}">${verdict.icon} ${verdict.phrase}</div>
+    <div class="tier-pill ${verdict.tier} picker-simple-phrase">${verdict.simplePhrase}</div>
     <p class="muted">${getPickerModeHeadline(type)} generated for ${game.label}.</p>
-    <p class="muted">${verdict.explanation}</p>
     <div class="stats-list">
       <div class="stats-row"><span>Main line</span><div>${renderPickedLine(selectedMain, 'main')}</div></div>
       <div class="stats-row"><span>${game.bonusCount > 0 ? game.bonusLabel : 'Bonus line'}</span><div>${game.bonusCount > 0 ? renderPickedLine(selectedBonus, 'bonus') : '<strong>Not applicable</strong>'}</div></div>
@@ -5839,30 +5894,5 @@ function clearSelections() {
       updateTopResetVisibility();
     })();
 </script>
-
-<script>
-const phrases = {
-  HOT: ["These will definitely win, maybe.","A hot potato","Spicy pick","Digits unmissable"],
-  COLD: ["Damp squiblets","Pointless picks","Colder than your ex","Seriously, why bother?"],
-  OVERDUE: ["Better late than never","Recently shy","On a gap year","Ghosting pro"],
-  CHAOS: ["Heavy dooty","Hold on to your hats","Kamikazeeeee","Impact heavy"],
-  RANDOM: ["How's your luck bro","A random act of kindness","A bit hit or miss","Random Raymondo"]
-};
-
-function randomizeCards(){
-  document.querySelectorAll('.card').forEach(card=>{
-    const type = card.querySelector('h3')?.innerText.trim();
-    if(phrases[type]){
-      const arr = phrases[type];
-      const pick = arr[Math.floor(Math.random()*arr.length)];
-      let p = card.querySelector('p');
-      if(p){ p.innerText = pick; }
-    }
-  });
-}
-
-document.addEventListener('DOMContentLoaded', randomizeCards);
-</script>
-
 </body>
 </html>
