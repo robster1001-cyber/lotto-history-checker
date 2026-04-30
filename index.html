@@ -3408,25 +3408,7 @@
     <div class="home-entry home-card-help-panel hidden" id="homeCardHelpPanel">
       <div class="home-card-help-title">
         <strong id="homeCardHelpTitle">Quick help</strong>
-        <button class="home-card-help-close" id="homeCardHelpClose" type="button" aria-label="Close help">Done</button>
-      </div>
-      <div id="homeCardHelpBody">Tap a question mark to see what that tab does.</div>
-    </div>
-
-
-    <div class="home-entry home-footer-note" id="homeFooterNote">
-      <div>
-        Independently developed. Not affiliated with or endorsed by The National Lottery, Allwyn, Camelot, EuroMillions or any official lottery operator.
-      </div>
-      <div class="home-footer-meta" id="homeFooterMeta">Real draw data • Updated: 05/04/2026</div>
-    </div>
-
-    <section class="grid workspace-shell hidden" id="workspaceShell">
-      <div class="card panel left panel-left-shell">
-        <div class="section-title">
-          <div>
-            <h2 id="panelTitle">Your Numbers</h2>
-            <p id="panelSubtitle">Ever wondered how lucky your lucky numbers actually are? Play below.</p>
+        <button class="home-card-help-close" id="homeCardHelpClose" type="button" aria-label="Close help">Done</button
           </div>
         </div>
 
@@ -4302,28 +4284,42 @@ async function loadSetForLifeData() {
         pickerResultsBox.innerHTML = loadingMessage;
       }
 
-      document.getElementById('checkBtn').disabled = true;
-      document.getElementById('runChallengeBtn').disabled = true;
-      document.getElementById('pickerTestBtn').disabled = true;
+      const checkBtn = document.getElementById('checkBtn');
+      const runChallengeBtn = document.getElementById('runChallengeBtn');
+      const pickerTestBtn = document.getElementById('pickerTestBtn');
 
-      try {
-        const [lottoData, euromillionsData, thunderballData, setForLifeData] = await Promise.all([
-          loadLottoData(),
-          loadEuromillionsData(),
-          loadThunderballData(),
-          loadSetForLifeData()
-        ]);
-        games.lotto.draws = lottoData;
-        games.euromillions.draws = euromillionsData;
-        games.thunderball.draws = thunderballData;
-        games.setforlife.draws = setForLifeData;
-        buildDrawEngine();
-        updateHomeFooterDate();
-      } finally {
-        document.getElementById('checkBtn').disabled = false;
-        document.getElementById('runChallengeBtn').disabled = false;
-        document.getElementById('pickerTestBtn').disabled = false;
-      }
+      if (checkBtn) checkBtn.disabled = true;
+      if (runChallengeBtn) runChallengeBtn.disabled = true;
+      if (pickerTestBtn) pickerTestBtn.disabled = true;
+
+      const dataLoaders = {
+        lotto: loadLottoData,
+        euromillions: loadEuromillionsData,
+        thunderball: loadThunderballData,
+        setforlife: loadSetForLifeData
+      };
+
+      const results = await Promise.allSettled(
+        Object.entries(dataLoaders).map(async ([gameKey, loader]) => ({
+          gameKey,
+          data: await loader()
+        }))
+      );
+
+      results.forEach(result => {
+        if (result.status === 'fulfilled' && Array.isArray(result.value.data)) {
+          games[result.value.gameKey].draws = result.value.data;
+        } else if (result.status === 'rejected') {
+          console.warn('Draw data failed to load:', result.reason);
+        }
+      });
+
+      buildDrawEngine();
+      updateHomeFooterDate();
+
+      if (checkBtn) checkBtn.disabled = false;
+      if (runChallengeBtn) runChallengeBtn.disabled = false;
+      if (pickerTestBtn) pickerTestBtn.disabled = false;
     }
 
     buildDrawEngine();
@@ -4459,7 +4455,7 @@ function pickFromPool(pool, count) {
     }
 
     function updateHomeFooterDate() {
-      const footerMeta = document.getElementById('homeFooterMeta');
+      const footerMeta = document.getElementById('homeFooterMeta') || document.querySelector('.site-footer-meta');
       if (!footerMeta) return;
 
       const allDates = Object.values(games)
@@ -4468,7 +4464,7 @@ function pickFromPool(pool, count) {
         .sort();
 
       const latestDate = allDates.length ? allDates[allDates.length - 1] : null;
-      footerMeta.textContent = `Real draw data • Updated: ${latestDate ? formatDate(latestDate) : '05/04/2026'}`;
+      footerMeta.textContent = `© 2026 Lotto History Checker • Real draw data • Updated: ${latestDate ? formatDate(latestDate) : '05/04/2026'}`;
     }
 
 
@@ -6498,5 +6494,6 @@ function clearSelections() {
     });
 
   </script>
+
 </body>
 </html>
