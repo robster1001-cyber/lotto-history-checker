@@ -3361,7 +3361,31 @@
       }
     }
 
-  </style>
+  
+/* Desktop tidy-up: centre the input panel before any result is showing */
+@media (min-width: 981px) {
+  .app.feature-check:not(:has(#historyResultsBox:not(.hidden))) .right,
+  .app.feature-challenge:not(:has(#challengeResultsBox:not(.hidden))) .right,
+  .app.feature-picker:not(:has(#pickerResultsBox:not(.hidden))) .right {
+    display: none;
+  }
+
+  .app.feature-check:not(:has(#historyResultsBox:not(.hidden))) .left,
+  .app.feature-challenge:not(:has(#challengeResultsBox:not(.hidden))) .left,
+  .app.feature-picker:not(:has(#pickerResultsBox:not(.hidden))) .left {
+    grid-column: 1 / -1;
+    width: min(720px, 100%);
+    margin: 0 auto;
+  }
+
+  .app.feature-check:not(:has(#historyResultsBox:not(.hidden))) .workspace-shell,
+  .app.feature-challenge:not(:has(#challengeResultsBox:not(.hidden))) .workspace-shell,
+  .app.feature-picker:not(:has(#pickerResultsBox:not(.hidden))) .workspace-shell {
+    justify-items: center;
+  }
+}
+
+</style>
 </head>
 <body>
   <div class="page-shell">
