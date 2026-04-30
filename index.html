@@ -5839,5 +5839,30 @@ function clearSelections() {
       updateTopResetVisibility();
     })();
 </script>
+
+<script>
+const phrases = {
+  HOT: ["These will definitely win, maybe.","A hot potato","Spicy pick","Digits unmissable"],
+  COLD: ["Damp squiblets","Pointless picks","Colder than your ex","Seriously, why bother?"],
+  OVERDUE: ["Better late than never","Recently shy","On a gap year","Ghosting pro"],
+  CHAOS: ["Heavy dooty","Hold on to your hats","Kamikazeeeee","Impact heavy"],
+  RANDOM: ["How's your luck bro","A random act of kindness","A bit hit or miss","Random Raymondo"]
+};
+
+function randomizeCards(){
+  document.querySelectorAll('.card').forEach(card=>{
+    const type = card.querySelector('h3')?.innerText.trim();
+    if(phrases[type]){
+      const arr = phrases[type];
+      const pick = arr[Math.floor(Math.random()*arr.length)];
+      let p = card.querySelector('p');
+      if(p){ p.innerText = pick; }
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', randomizeCards);
+</script>
+
 </body>
 </html>
