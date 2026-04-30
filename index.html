@@ -4682,7 +4682,7 @@ function renderPickerNumbers() {
             .map(x => parseInt(x.value, 10))
             .filter(x => !Number.isNaN(x) && x >= 1 && x <= game.mainMax);
           selectedMain = [...new Set(vals)].slice(0, game.mainCount);
-          updateSelectedDisplay();
+          updateSelectedDis
         });
         mainLineInputs.appendChild(input);
       }
