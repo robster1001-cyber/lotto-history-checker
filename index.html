@@ -6480,5 +6480,36 @@ function clearSelections() {
     });
 
   </script>
+
+<script>
+(function(){
+  function getLatestDate(){
+    try{
+      const allDates = [];
+
+      if (typeof lottoData !== 'undefined') {
+        lottoData.forEach(d => allDates.push(new Date(d.date)));
+      }
+      if (typeof euroData !== 'undefined') {
+        euroData.forEach(d => allDates.push(new Date(d.date)));
+      }
+
+      if (!allDates.length) return new Date();
+
+      return new Date(Math.max.apply(null, allDates));
+    }catch(e){
+      return new Date();
+    }
+  }
+
+  const el = document.getElementById('lastUpdated');
+  if(el){
+    const d = getLatestDate();
+    const formatted = d.toLocaleDateString('en-GB');
+    el.textContent = formatted;
+  }
+})();
+</script>
+
 </body>
 </html>
