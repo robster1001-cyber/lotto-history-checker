@@ -3275,12 +3275,96 @@
       }
     }
 
+
+    /* Final desktop tidy-up: centred app, no live ad placeholders, footer back at bottom */
+    .page-shell {
+      display: block !important;
+      width: 100% !important;
+      max-width: 1040px !important;
+      margin: 0 auto !important;
+      padding: 24px 24px 0 !important;
+    }
+
+    .page-shell > .app {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 auto !important;
+      padding: 0 0 24px !important;
+      min-height: 100vh;
+    }
+
+    .ad-rail,
+    .ad-slot,
+    .home-entry.ad-home,
+    .ad-results {
+      display: none !important;
+    }
+
+    .hero {
+      margin: 0 auto 10px !important;
+      width: 100% !important;
+      max-width: 980px !important;
+      padding-top: 0 !important;
+    }
+
+    .hero-art {
+      overflow: hidden !important;
+      border-radius: 18px !important;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.26) !important;
+    }
+
+    .hero-art img {
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      max-height: 240px !important;
+      margin: 0 !important;
+      display: block !important;
+      object-fit: contain !important;
+      object-position: center !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+    }
+
+    .home-cards {
+      max-width: 980px !important;
+      margin: 0 auto 18px !important;
+    }
+
+    .home-footer-note {
+      max-width: 980px !important;
+      margin: 24px auto 0 !important;
+      padding: 12px 4px 6px !important;
+    }
+
+    .site-footer {
+      max-width: 980px !important;
+      margin: 28px auto 0 !important;
+      padding-bottom: 12px !important;
+    }
+
+    @media (max-width: 620px) {
+      .page-shell {
+        padding: 16px !important;
+      }
+
+      .hero {
+        margin-bottom: 14px !important;
+      }
+
+      .hero-art {
+        border-radius: 16px !important;
+      }
+
+      .hero-art img {
+        max-height: none !important;
+      }
+    }
+
   </style>
 </head>
 <body>
   <div class="page-shell">
-    <aside class="ad-rail ad-rail-left" aria-hidden="true"></aside>
-
     <div class="app">
     
     
@@ -3329,10 +3413,6 @@
       <div id="homeCardHelpBody">Tap a question mark to see what that tab does.</div>
     </div>
 
-
-    <div class="home-entry ad-slot ad-home" aria-label="Advertising space">
-      <span>Advert space</span>
-    </div>
 
     <div class="home-entry home-footer-note" id="homeFooterNote">
       <div>
@@ -3567,10 +3647,6 @@
         </div>
 
 
-        <div class="ad-slot ad-results" aria-label="Advertising space">
-          <span>Advert space</span>
-        </div>
-
         <button class="results-back-top hidden" id="resultsBackTopBtn" type="button">↑ Top</button>
 </div>
     </section>
@@ -3599,8 +3675,6 @@
     </footer>
 
     </div>
-
-    <aside class="ad-rail ad-rail-right" aria-hidden="true"></aside>
   </div>
 
   <div class="picker-reveal-overlay hidden" id="pickerRevealOverlay" aria-hidden="true">
