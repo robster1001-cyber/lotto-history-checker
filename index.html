@@ -3385,6 +3385,24 @@
   }
 }
 
+
+/* PC tidy-up v2: centre the starting panel for Your Numbers + Bulk Buy too */
+@media (min-width: 981px) {
+  #workspaceShell:has(#checkSection:not(.hidden)):has(#historyResultsBox.hidden) .right,
+  #workspaceShell:has(#challengeSection:not(.hidden)):has(#challengeResultsBox.hidden) .right,
+  #workspaceShell:has(#pickerSection:not(.hidden)):has(#pickerResultsBox.hidden) .right {
+    display: none !important;
+  }
+
+  #workspaceShell:has(#checkSection:not(.hidden)):has(#historyResultsBox.hidden) .left,
+  #workspaceShell:has(#challengeSection:not(.hidden)):has(#challengeResultsBox.hidden) .left,
+  #workspaceShell:has(#pickerSection:not(.hidden)):has(#pickerResultsBox.hidden) .left {
+    grid-column: 1 / -1 !important;
+    width: min(720px, 100%) !important;
+    margin: 0 auto !important;
+  }
+}
+
 </style>
 </head>
 <body>
