@@ -2798,44 +2798,86 @@
 
 
 
-    /* Simplified picker reveal cards: category + one random phrase only */
+    /* Simple picker cards + random phrase treatment */
+    .picker-card-row {
+      display: grid !important;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .picker-card-option {
+      min-height: 104px;
+      padding: 14px 12px;
+      border-radius: 18px;
+      display: flex !important;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      text-align: left;
+      background: rgba(15,23,42,0.82);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, border-color 0.14s ease, background 0.14s ease;
+    }
+
+    .picker-card-option:hover,
+    .picker-card-option.active-game {
+      transform: translateY(-2px);
+      border-color: rgba(242,201,76,0.34);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.22), 0 0 18px rgba(242,201,76,0.08);
+      background: rgba(30,41,59,0.96);
+    }
+
+    .picker-style-title {
+      display: block;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .picker-style-phrase,
+    .picker-simple-phrase {
+      display: block;
+      font-size: clamp(1.05rem, 2vw, 1.45rem);
+      line-height: 1.08;
+      font-weight: 900;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+    }
+
     .picker-reveal-kicker,
-    .picker-reveal-text,
-    .picker-personality-title,
-    .picker-personality-copy {
+    .picker-reveal-text.hidden,
+    .picker-personality-copy.hidden {
       display: none !important;
     }
 
-    .picker-reveal-title {
-      margin-bottom: 14px !important;
-      font-size: clamp(1.05rem, 3.4vw, 1.35rem) !important;
-      letter-spacing: 0.14em !important;
-      color: var(--muted) !important;
-      text-transform: uppercase !important;
-      text-shadow: none !important;
-    }
-
     .picker-reveal-pill.picker-simple-phrase {
-      display: flex !important;
-      justify-content: center !important;
-      width: 100% !important;
-      margin: 0 auto !important;
-      padding: 14px 16px !important;
-      border-radius: 18px !important;
-      font-size: clamp(1.55rem, 6vw, 2.35rem) !important;
-      line-height: 1.08 !important;
-      text-align: center !important;
-      letter-spacing: -0.02em !important;
+      font-size: clamp(1.45rem, 5vw, 2.35rem);
+      line-height: 1.05;
+      padding: 0;
+      border: none;
+      background: transparent;
+      box-shadow: none;
+      color: #f8fafc;
+      text-align: center;
     }
 
     #pickerVerdictPill.picker-simple-phrase {
-      display: block !important;
-      font-size: clamp(1.25rem, 4vw, 1.75rem) !important;
-      line-height: 1.12 !important;
-      margin-top: 2px !important;
-      margin-bottom: 0 !important;
+      font-size: clamp(1.15rem, 3vw, 1.6rem);
+      line-height: 1.08;
+      margin-bottom: 0;
     }
 
+    @media (max-width: 760px) {
+      .picker-card-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .picker-card-option {
+        min-height: 96px;
+      }
+    }
 
 </style>
 </head>
@@ -3015,19 +3057,18 @@
 
           <div class="button-group-shell picker-reveal-hidden" id="pickerControlsWrap">
             <div class="section-label">Play style</div>
-            <div class="btn-row picker-style-row">
-              <button id="pickerLuckyBtn" class="picker-style-btn"><span class="label-text">Random</span><span class="mode-help" data-style="lucky" data-title="Random" data-tip="A fully random line. No heat maps, no theories, just pure number chaos in a tidy shirt." role="button" tabindex="0" aria-label="Explain Random">?</span></button>
-              <button id="pickerHotBtn" class="picker-style-btn"><span class="label-text">Hot Pick</span><span class="mode-help" data-style="hot" data-title="Hot Pick" data-tip="Leans into the historically common numbers, for when you fancy pretending recent heat means something." role="button" tabindex="0" aria-label="Explain Hot Pick">?</span></button>
-              <button id="pickerColdBtn" class="picker-style-btn"><span class="label-text">Cold Pick</span><span class="mode-help" data-style="cold" data-title="Cold Pick" data-tip="Backs the neglected weirdos — the rarer numbers that have not shown up as often over the years." role="button" tabindex="0" aria-label="Explain Cold Pick">?</span></button>
-              <button id="pickerOverdueBtn" class="picker-style-btn"><span class="label-text">Overdue Pick</span><span class="mode-help" data-style="overdue" data-title="Overdue Pick" data-tip="Chases numbers that have gone the longest without appearing. Peak gambler logic. Great fun." role="button" tabindex="0" aria-label="Explain Overdue Pick">?</span></button>
-              <button id="pickerChaosBtn" class="picker-style-btn"><span class="label-text">Chaos Pick</span><span class="mode-help" data-style="chaos" data-title="Chaos Pick" data-tip="Deliberately makes odd-looking lines with clumps, runs and suspicious little patterns. Hideous. Tempting." role="button" tabindex="0" aria-label="Explain Chaos Pick">?</span></button>
+            <div class="btn-row picker-style-row picker-card-row">
+              <button id="pickerLuckyBtn" class="picker-style-btn picker-card-option" type="button" data-picker-mode="lucky"><span class="picker-style-title">RANDOM</span><span class="picker-style-phrase" data-picker-phrase="lucky">Random Raymondo</span></button>
+              <button id="pickerHotBtn" class="picker-style-btn picker-card-option" type="button" data-picker-mode="hot"><span class="picker-style-title">HOT</span><span class="picker-style-phrase" data-picker-phrase="hot">Spicy pick</span></button>
+              <button id="pickerColdBtn" class="picker-style-btn picker-card-option" type="button" data-picker-mode="cold"><span class="picker-style-title">COLD</span><span class="picker-style-phrase" data-picker-phrase="cold">Pointless picks</span></button>
+              <button id="pickerOverdueBtn" class="picker-style-btn picker-card-option" type="button" data-picker-mode="overdue"><span class="picker-style-title">OVERDUE</span><span class="picker-style-phrase" data-picker-phrase="overdue">Better late than never</span></button>
+              <button id="pickerChaosBtn" class="picker-style-btn picker-card-option" type="button" data-picker-mode="chaos"><span class="picker-style-title">CHAOS</span><span class="picker-style-phrase" data-picker-phrase="chaos">Hold on to your hats</span></button>
             </div>
             <div class="picker-help-panel hidden" id="pickerHelpPanel"></div>
           </div>
 
           <div class="picker-post-style hidden" id="pickerPostStyleArea">
             <div class="subsection picker-personality-sticky">
-              <h4 class="picker-personality-title hidden"></h4>
               <div class="tier-pill mid dim picker-simple-phrase" id="pickerVerdictPill">Pick a style</div>
               <p class="muted picker-personality-copy hidden" id="pickerVerdictText"></p>
             </div>
@@ -3127,12 +3168,9 @@
 </div>
     </section>
   </div>
-
-  <button class="sound-toggle-btn" id="soundToggleBtn" type="button" aria-label="Sound on" title="Sound on">🔊</button>
-
-  <div class="picker-reveal-overlay hidden" id="pickerRevealOverlay" aria-hidden="true">
+<div class="picker-reveal-overlay hidden" id="pickerRevealOverlay" aria-hidden="true">
     <div class="picker-reveal-card reveal-lucky">
-      <div class="picker-reveal-kicker hidden">Pick style</div>
+      <div class="picker-reveal-kicker"> </div>
       <h3 class="picker-reveal-title" id="pickerRevealTitle">RANDOM</h3>
       <div class="picker-reveal-pill mid picker-simple-phrase" id="pickerRevealPill">Random Raymondo</div>
       <p class="picker-reveal-text hidden" id="pickerRevealText"></p>
@@ -3371,7 +3409,6 @@
         syncSoundToggle();
         if (soundEnabled) {
           unlockAndPrimeSounds();
-          playAppSound('tabs');
         }
       });
     }
@@ -3381,17 +3418,14 @@
       if (!target || target.closest('#soundToggleBtn')) return;
 
       if (target.closest('.number-btn, .breakdown-toggle summary, .bulk-meta-toggle summary, .year-block summary, .mode-help, .card-help, #homeCardHelpClose')) {
-        playAppSound('grid');
         return;
       }
 
       if (target.closest('.feature-card, [data-game], [data-challenge-game], [data-picker-game], [data-history-game], [data-ticket-game]')) {
-        playAppSound('tabs');
         return;
       }
 
       if (target.closest('#topResetBtn, #ticketTopBtn, #resultsBackTopBtn, #clearBtn, #clearChallengeBtn, #pickerClearBtn')) {
-        playAppSound('reset');
       }
     }, { passive: true });
 window.LOTTO_DATA = [];
@@ -3802,14 +3836,6 @@ async function loadSetForLifeData() {
     const ticketHistoryIntroBox = document.getElementById('ticketHistoryIntroBox');
     const ticketHistoryTitle = document.getElementById('ticketHistoryTitle');
     const ticketHistorySubtitle = document.getElementById('ticketHistorySubtitle');
-
-    const verdictPhrases = {
-      smart: ['Spicy pick'],
-      mid: ['Random Raymondo'],
-      cold: ['Pointless picks']
-    };
-
-
     const pickerPhraseGroups = {
       hot: ['These will definitely win, maybe.', 'A hot potato', 'Spicy pick', 'Digits unmissable'],
       cold: ['Damp squiblets', 'Pointless picks', 'Colder than your ex', 'Seriously, why bother?'],
@@ -3823,16 +3849,14 @@ async function loadSetForLifeData() {
       return list[Math.floor(Math.random() * list.length)];
     }
 
-    const impatientPhrases = [
-      { pill: '😏 Well go on then…', text: 'Pick something interesting and let the numbers earn their keep.' },
-      { pill: '👀 We’re waiting…', text: 'Hot, cold, overdue or chaos — give the poor numbers a job to do.' },
-      { pill: '🎯 Your move, champ.', text: 'Press a button and let’s see what questionable genius appears.' },
-      { pill: '🤔 Still thinking?', text: 'Numbers do not pick themselves you know.' },
-      { pill: '🧠 Alright Einstein…', text: 'Build a ticket and show us the big brain.' },
-      { pill: '🎲 Go on… give it a whirl.', text: 'Lottery glory awaits… maybe.' },
-      { pill: '😅 Feeling shy?', text: 'Pick a strategy and let the numbers roll.' },
-      { pill: '🍀 Let’s make a terrible financial decision.', text: 'Pick a style and test your luck.' },
-    ];
+    function randomisePickerCardPhrases() {
+      document.querySelectorAll('[data-picker-phrase]').forEach(el => {
+        const mode = el.getAttribute('data-picker-phrase');
+        el.textContent = getRandomPickerPhrase(mode);
+      });
+    }
+
+    const impatientPhrases = [{ pill: 'Pick a style', text: '' }];
     const panelTitle = document.getElementById('panelTitle');
     const panelSubtitle = document.getElementById('panelSubtitle');
 
@@ -4185,16 +4209,8 @@ function pickFromPool(pool, count) {
       coldBtn.classList.toggle('active-game', mode === 'cold');
       overdueBtn.classList.toggle('active-game', mode === 'overdue');
       chaosBtn.classList.toggle('active-game', mode === 'chaos');
-
-      const descriptions = {
-        lucky: 'Random is a fully random line — no heat maps, no theories, just pure number chaos in a tidy shirt.',
-        hot: 'Hot Pick leans into the historically common numbers, for when you fancy pretending recent heat means something.',
-        cold: 'Cold Pick backs the neglected weirdos — the rarer numbers that have not shown up as often over the years.',
-        overdue: 'Overdue Pick chases numbers that have gone the longest without appearing, which is peak gambler logic and great fun.',
-        chaos: 'Chaos Pick deliberately makes odd-looking lines with clumps, runs and suspicious little patterns. Hideous. Tempting.'
-      };
-
-      desc.textContent = descriptions[mode] || 'Need numbers for the real lottery? Pick a style below and let this thing do the hard part.';
+      desc.textContent = '';
+      desc.classList.add('hidden');
     }
 
     function updateSelectedDisplay() {
@@ -4398,14 +4414,9 @@ function pickFromPool(pool, count) {
       if (score >= 68) tier = 'smart';
       else if (score <= 42) tier = 'cold';
 
-      const phrase = pickPhrase(verdictPhrases[tier], sorted.reduce((a, b) => a + b, 0) + strategy.length);
-      const icon = tier === 'smart' ? '🧠' : tier === 'mid' ? '☕' : '❄';
-
-      let explanation = 'A perfectly average-looking line.';
-      if (tier === 'smart') explanation = `This line looks statistically tasty with ${hotCount} hot number${hotCount === 1 ? '' : 's'} and a tidy spread.`;
-      if (tier === 'cold') explanation = `This one leans chilly with ${coldCount} cold number${coldCount === 1 ? '' : 's'} and a more questionable layout.`;
-      if (strategy === 'chaos') explanation = 'This line is proudly weird on purpose. Ideal if you want glorious nonsense.';
-      if (strategy === 'overdue' && tier !== 'cold') explanation = `This line leans on overdue numbers, with ${overdueCount} that have been missing longer than usual.`;
+      const phrase = getRandomPickerPhrase(strategy === 'manual' ? 'lucky' : strategy);
+      const icon = '';
+      const explanation = '';
 
       return { score, tier, phrase, icon, explanation, hotCount, coldCount, overdueCount };
     }
@@ -4442,7 +4453,7 @@ function pickFromPool(pool, count) {
       }
 
       pickerRevealTitle.textContent = getPickerModeHeadline(mode);
-      pickerRevealPill.className = `picker-reveal-pill ${verdict.tier} picker-simple-phrase`;
+      pickerRevealPill.className = 'picker-reveal-pill mid picker-simple-phrase';
       pickerRevealPill.textContent = verdict.simplePhrase || getRandomPickerPhrase(mode);
       pickerRevealText.textContent = '';
 
@@ -4477,9 +4488,9 @@ function pickFromPool(pool, count) {
         return;
       }
 
-      const verdict = analyseTicket(selectedMain, strategy);
-      pill.className = `tier-pill ${verdict.tier} picker-simple-phrase`;
-      pill.textContent = getRandomPickerPhrase(strategy);
+      const phrase = getRandomPickerPhrase(strategy);
+      pill.className = 'tier-pill mid picker-simple-phrase';
+      pill.textContent = phrase;
       text.textContent = '';
     }
 
@@ -4886,12 +4897,9 @@ function scrollToIncompleteNumberGrid() {
   const hasBonus = game.bonusCount > 0;
 
   if (selectedMain.length !== game.mainCount || (hasBonus && selectedBonus.length !== game.bonusCount)) {
-    playAppSound('thud');
     scrollToIncompleteNumberGrid();
     return;
   }
-
-  playAppSound('check');
 
   const start = getStartDateLabelAndValue();
 
@@ -4975,7 +4983,6 @@ function scrollToIncompleteNumberGrid() {
     breakdownRows
   });
   updateResultsVisibility(currentFeature);
-  playAppSound(profitLoss >= 0 ? 'win' : 'lose');
   scrollToResultBox(historyResultsBox);
   updateResultsBackTopVisibility();
 }
@@ -5036,9 +5043,8 @@ function applyPicker(type) {
   renderIntelligence();
 
   const verdict = analyseTicket(selectedMain, type);
-  verdict.simplePhrase = getRandomPickerPhrase(type);
 
-  playAppSound('cards');
+  
 
   showPickerPersonalityReveal(verdict, type).then(() => {
     if (pickerGeneratedArea) {
@@ -5048,15 +5054,11 @@ function applyPicker(type) {
 
   pickerResultsBox.innerHTML = `
     <div class="kicker">Picker result</div>
-    <h3>Generated line ready</h3>
-    <div class="tier-pill ${verdict.tier} picker-simple-phrase">${verdict.simplePhrase}</div>
-    <p class="muted">${getPickerModeHeadline(type)} generated for ${game.label}.</p>
+    <h3>${getPickerModeHeadline(type)} line ready</h3>
+    <div class="tier-pill mid picker-simple-phrase">${verdict.simplePhrase}</div>
     <div class="stats-list">
       <div class="stats-row"><span>Main line</span><div>${renderPickedLine(selectedMain, 'main')}</div></div>
       <div class="stats-row"><span>${game.bonusCount > 0 ? game.bonusLabel : 'Bonus line'}</span><div>${game.bonusCount > 0 ? renderPickedLine(selectedBonus, 'bonus') : '<strong>Not applicable</strong>'}</div></div>
-      <div class="stats-row"><span>Hot numbers in line</span><strong>${verdict.hotCount}</strong></div>
-      <div class="stats-row"><span>Cold numbers in line</span><strong>${verdict.coldCount}</strong></div>
-      <div class="stats-row"><span>Overdue numbers in line</span><strong>${verdict.overdueCount}</strong></div>
     </div>
     <div style="height:12px"></div>
     <p class="muted">Press <strong>Test This Line</strong> to run this ticket against the historical draws.</p>
@@ -5076,8 +5078,6 @@ function runPickerCheck() {
         scrollToResultBox(pickerResultsBox);
         return;
       }
-
-      playAppSound('check');
 
       const start = { label: `Lottery launch ${formatDate(games[currentGame]?.startDate || '1994-11-19')}`, date: '' };
       const draws = game.draws;
@@ -5140,7 +5140,6 @@ function runPickerCheck() {
         bonusLineHtml: game.bonusCount > 0 ? (selectedBonus.length ? `<div class="selected-line-compact">${sortNums(selectedBonus).map(n => `<span class="picked-ball bonus">${n}</span>`).join('')}</div>` : renderPickedLine(selectedBonus, 'bonus')) : '<strong>Not applicable</strong>'
       });
       updateResultsVisibility('picker');
-      playAppSound(profitLoss >= 0 ? 'win' : 'lose');
       scrollToResultBox(pickerResultsBox);
       updateResultsBackTopVisibility();
     }
@@ -5391,7 +5390,6 @@ function runPickerCheck() {
 }
 
 function clearSelections() {
-      playAppSound('clear');
       selectedMain = [];
       selectedBonus = [];
       currentPickerMode = 'manual';
@@ -5404,7 +5402,6 @@ function clearSelections() {
     }
 
     function clearChallengeSelections() {
-      playAppSound('clear');
       challengeTickets = 10;
       challengeGameChosen = false;
       currentGame = 'lotto';
@@ -5819,7 +5816,6 @@ function clearSelections() {
     });
 
     document.getElementById('runChallengeBtn').addEventListener('click', () => {
-      playAppSound('check');
       runChallenge();
     });
     document.getElementById('clearChallengeBtn').addEventListener('click', clearChallengeSelections);
@@ -5870,7 +5866,6 @@ function clearSelections() {
       }
 
       if (replayBtn) {
-        playAppSound('check');
         runChallenge();
       }
     });
@@ -5893,6 +5888,8 @@ function clearSelections() {
       renderTicketSelectionState();
       updateTopResetVisibility();
     })();
-</script>
+
+    document.addEventListener('DOMContentLoaded', randomisePickerCardPhrases);
+  </script>
 </body>
 </html>
