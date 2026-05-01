@@ -5600,6 +5600,8 @@ function applyPicker(type) {
   currentPickerMode = type;
 
   const game = games[currentGame];
+  const previousMain = sortNums(selectedMain || []).join(',');
+  const previousBonus = sortNums(selectedBonus || []).join(',');
   const freq = calculateFrequency();
   const overdue = getMostOverdueNumbers(Math.min(game.mainMax, Math.max(15, game.mainCount * 3)));
   const poolSize = Math.min(game.mainMax, Math.max(15, game.mainCount * 3));
@@ -5607,42 +5609,54 @@ function applyPicker(type) {
   const coldPool = freq.slice(-poolSize).map(x => x.n);
   const overduePool = overdue.slice(0, poolSize).map(x => x.n);
 
-  if (type === 'lucky') {
-    selectedMain = randomUnique(game.mainMax, game.mainCount);
-  } else if (type === 'hot') {
-    selectedMain = pickFromPool(hotPool, game.mainCount);
-  } else if (type === 'cold') {
-    selectedMain = pickFromPool(coldPool, game.mainCount);
-  } else if (type === 'overdue') {
-    selectedMain = pickFromPool(overduePool, game.mainCount);
-  } else if (type === 'chaos') {
-    const chaosModes = ['run', 'cluster', 'highs', 'lows', 'paired'];
-    const chaosMode = chaosModes[Math.floor(Math.random() * chaosModes.length)];
+  const buildMainLine = () => {
+    if (type === 'lucky') {
+      return randomUnique(game.mainMax, game.mainCount);
+    } else if (type === 'hot') {
+      return pickFromPool(hotPool, game.mainCount);
+    } else if (type === 'cold') {
+      return pickFromPool(coldPool, game.mainCount);
+    } else if (type === 'overdue') {
+      return pickFromPool(overduePool, game.mainCount);
+    } else if (type === 'chaos') {
+      const chaosModes = ['run', 'cluster', 'highs', 'lows', 'paired'];
+      const chaosMode = chaosModes[Math.floor(Math.random() * chaosModes.length)];
 
-    if (chaosMode === 'run') {
-      const start = Math.max(1, Math.min(game.mainMax - game.mainCount + 1, Math.floor(Math.random() * (game.mainMax - game.mainCount + 1)) + 1));
-      selectedMain = Array.from({ length: game.mainCount }, (_, i) => start + i).sort((a, b) => a - b);
-    } else if (chaosMode === 'cluster') {
-      const clusterStart = Math.max(1, Math.min(game.mainMax - 9, Math.floor(Math.random() * Math.max(1, game.mainMax - 9)) + 1));
-      const clusterPool = [];
-      for (let i = clusterStart; i <= Math.min(game.mainMax, clusterStart + 9); i++) clusterPool.push(i);
-      selectedMain = pickFromPool(clusterPool, game.mainCount);
-    } else if (chaosMode === 'highs') {
-      const highPool = Array.from({ length: Math.min(15, game.mainMax) }, (_, i) => game.mainMax - i).sort((a, b) => a - b);
-      selectedMain = pickFromPool(highPool, game.mainCount);
-    } else if (chaosMode === 'lows') {
-      const lowPool = Array.from({ length: Math.min(15, game.mainMax) }, (_, i) => i + 1);
-      selectedMain = pickFromPool(lowPool, game.mainCount);
-    } else {
-      const base = Math.floor(Math.random() * Math.max(1, game.mainMax - 12)) + 1;
-      const pairPool = [base, base + 1, base + 2, base + 6, base + 7, base + 8].filter(n => n <= game.mainMax);
-      selectedMain = pickFromPool(pairPool, game.mainCount);
+      if (chaosMode === 'run') {
+        const start = Math.max(1, Math.min(game.mainMax - game.mainCount + 1, Math.floor(Math.random() * (game.mainMax - game.mainCount + 1)) + 1));
+        return Array.from({ length: game.mainCount }, (_, i) => start + i).sort((a, b) => a - b);
+      } else if (chaosMode === 'cluster') {
+        const clusterStart = Math.max(1, Math.min(game.mainMax - 9, Math.floor(Math.random() * Math.max(1, game.mainMax - 9)) + 1));
+        const clusterPool = [];
+        for (let i = clusterStart; i <= Math.min(game.mainMax, clusterStart + 9); i++) clusterPool.push(i);
+        return pickFromPool(clusterPool, game.mainCount);
+      } else if (chaosMode === 'highs') {
+        const highPool = Array.from({ length: Math.min(15, game.mainMax) }, (_, i) => game.mainMax - i).sort((a, b) => a - b);
+        return pickFromPool(highPool, game.mainCount);
+      } else if (chaosMode === 'lows') {
+        const lowPool = Array.from({ length: Math.min(15, game.mainMax) }, (_, i) => i + 1);
+        return pickFromPool(lowPool, game.mainCount);
+      } else {
+        const base = Math.floor(Math.random() * Math.max(1, game.mainMax - 12)) + 1;
+        const pairPool = [base, base + 1, base + 2, base + 6, base + 7, base + 8].filter(n => n <= game.mainMax);
+        return pickFromPool(pairPool, game.mainCount);
+      }
     }
-  } else {
-    selectedMain = randomUnique(game.mainMax, game.mainCount);
-  }
 
-  selectedBonus = game.bonusCount > 0 ? randomUnique(game.bonusMax, game.bonusCount) : [];
+    return randomUnique(game.mainMax, game.mainCount);
+  };
+
+  const buildBonusLine = () => game.bonusCount > 0 ? randomUnique(game.bonusMax, game.bonusCount) : [];
+
+  // Re-clicking the same style should always feel like a fresh spin.
+  for (let attempt = 0; attempt < 30; attempt++) {
+    selectedMain = buildMainLine();
+    selectedBonus = buildBonusLine();
+
+    const mainKey = sortNums(selectedMain).join(',');
+    const bonusKey = sortNums(selectedBonus).join(',');
+    if (mainKey !== previousMain || bonusKey !== previousBonus) break;
+  }
 
   setPickerPostStyleVisibility(true);
   renderPickerNumbers();
